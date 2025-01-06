@@ -1,0 +1,20 @@
+{
+	"name": "@repo/schema",
+	"version": "0.1.4",
+	"private": true,
+	"sideEffects": false,
+	"main": "./src/index.ts",
+	"scripts": {
+		"check:lint": "run-eslint-workers",
+		"check:types": "run-tsc",
+		"test": "run-vitest"
+	},
+	"dependencies": {
+		"zod": "3.24.1"
+	},
+	"devDependencies": {
+		"@repo/tools": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"vitest": "2.1.8"
+	}
+}

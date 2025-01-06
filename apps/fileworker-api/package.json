@@ -1,0 +1,35 @@
+{
+	"name": "fileworker-api",
+	"version": "0.1.0",
+	"private": true,
+	"sideEffects": false,
+	"scripts": {
+		"deploy:wrangler": "runx deploy wrangler",
+		"build:wrangler": "runx build wrangler",
+		"check:types": "run-tsc",
+		"check:lint": "run-eslint-workers",
+		"sentry:sourcemaps": "runx sentry sourcemaps fileworker-api",
+		"sentry:commits": "runx sentry commits fileworker-api",
+		"sentry:finalize": "runx sentry finalize fileworker-api",
+		"test": "run-vitest"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "0.5.40",
+		"@repo/tools": "workspace:*",
+		"@cloudflare/workers-types": "4.20241218.0",
+		"@repo/eslint-config": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"vitest": "2.1.8",
+		"wrangler": "3.99.0"
+	},
+	"dependencies": {
+		"@repo/otel": "workspace:*",
+		"@repo/cftrace": "workspace:*",
+		"@repo/hono-helpers": "workspace:*",
+		"@repo/logging": "workspace:*",
+		"@sentry/tracing": "7.76.0",
+		"@sentry/types": "7.76.0",
+		"hono": "4.4.13",
+		"toucan-js": "3.3.1"
+	}
+}

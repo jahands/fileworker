@@ -1,0 +1,4 @@
+.changeset
+pnpm-lock.yaml
+/turbo/generators/**/*.hbs
+**/migrations/**/*.sql
