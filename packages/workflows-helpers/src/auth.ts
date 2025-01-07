@@ -9,7 +9,7 @@ import type { Context, Next } from 'hono'
  */
 export async function useApiTokens<App extends WorkflowsApp>(
 	c: Context<App>,
-	next: Next
+	next: Next,
 ): Promise<void> {
 	const tokens = ApiTokens.safeParse(JSON.parse(c.env.API_TOKENS))
 	if (!tokens.success) {

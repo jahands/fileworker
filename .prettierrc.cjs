@@ -19,25 +19,37 @@ const codeImports = [
 // Type imports are ordered the same way, but without separators.
 // We also need a catch-all <TYPES> here to prevent prettier from failing.
 const typeImports = ['<TYPES>'].concat(
-	codeImports.filter((i) => i !== '').map((i) => `<TYPES>${i}`)
+	codeImports.filter((i) => i !== '').map((i) => `<TYPES>${i}`),
 )
 
 /** @type {import("prettier").Config} */
 const config = {
-	trailingComma: 'es5',
+	trailingComma: 'all',
 	tabWidth: 2,
 	useTabs: true,
 	semi: false,
 	singleQuote: true,
 	printWidth: 100,
-	plugins: ['@ianvs/prettier-plugin-sort-imports'],
-	importOrder: [...codeImports, ...typeImports],
+	plugins: [
+		'@ianvs/prettier-plugin-sort-imports',
+		'prettier-plugin-multiline-arrays',
+	],
+	importOrder: [
+		...codeImports,
+		...typeImports,
+	],
 	importOrderTypeScriptVersion: '5.5.4',
 	overrides: [
 		{
 			files: '*.jsonc',
 			options: {
 				trailingComma: 'none',
+			},
+		},
+		{
+			files: 'package.json',
+			options: {
+				useTabs: false,
 			},
 		},
 	],

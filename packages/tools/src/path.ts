@@ -6,5 +6,5 @@ export const getRepoRoot = memoizeOne(async () =>
 		.string()
 		.trim()
 		.startsWith('/')
-		.parse(await $`git rev-parse --show-toplevel`.text())
+		.parse(await $`git rev-parse --show-toplevel`.text()),
 )

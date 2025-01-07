@@ -10,7 +10,7 @@ const didSucceed = (code: number) => `${code}` === '0'
 export function writeWorkflowsApiTokens(
 	answers: Answers,
 	_config: unknown,
-	_plop: PlopTypes.NodePlopAPI
+	_plop: PlopTypes.NodePlopAPI,
 ) {
 	return new Promise((resolve, reject) => {
 		const proc = spawn('pnpm', ['-F', `${slugifyText(answers.name)}`, 'write-api-tokens'], {

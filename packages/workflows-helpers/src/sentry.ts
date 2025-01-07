@@ -8,7 +8,7 @@ import type { SharedHonoBindings } from '@repo/hono-helpers/src/types'
  */
 export function initWorkflowSentry(
 	env: Pick<SharedHonoBindings, 'SENTRY_DSN' | 'SENTRY_RELEASE' | 'ENVIRONMENT'>,
-	ctx: Pick<ExecutionContext, 'waitUntil'>
+	ctx: Pick<ExecutionContext, 'waitUntil'>,
 ): Toucan {
 	return new Toucan({
 		dsn: env.SENTRY_DSN,

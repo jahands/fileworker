@@ -15,7 +15,7 @@ export function useCloudflareAccess({
 	audience: AccessAudience
 }) {
 	const accessTeamDomain = AccessTeamDomain.parse(
-		`https://${AccessTeam.parse(team)}.cloudflareaccess.com`
+		`https://${AccessTeam.parse(team)}.cloudflareaccess.com`,
 	)
 	const accessAud = AccessAudience.parse(audience)
 
@@ -112,7 +112,7 @@ async function validateAccessJWT({
 		jwk,
 		{ name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
 		false,
-		['verify']
+		['verify'],
 	)
 
 	const unroundedSecondsSinceEpoch = Date.now() / 1000
@@ -137,7 +137,7 @@ async function validateAccessJWT({
 		'RSASSA-PKCS1-v1_5',
 		key,
 		base64URLDecode(signature),
-		asciiToUint8Array(`${header}.${payload}`)
+		asciiToUint8Array(`${header}.${payload}`),
 	)
 	if (!verified) {
 		throw new Error('Could not verify JWT.')
@@ -192,7 +192,7 @@ const PublicCERT = z.object({
 		.min(1)
 		.refine(
 			(c) => c.includes('-----BEGIN CERTIFICATE-----') && c.includes('-----END CERTIFICATE-----'),
-			{ message: 'invalid cert format - missing or invalid header/footer' }
+			{ message: 'invalid cert format - missing or invalid header/footer' },
 		),
 })
 

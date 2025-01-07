@@ -9,7 +9,7 @@ import type { HonoApp } from '../types'
  */
 export function getRequestLogData<T extends HonoApp>(
 	c: Context<T>,
-	requestStartTimestamp: number
+	requestStartTimestamp: number,
 ): LogDataRequest {
 	return {
 		url: redactUrl(c.req.url).toString(),

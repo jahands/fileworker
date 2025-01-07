@@ -33,7 +33,7 @@ export function useAuth(options: useAuthOptions) {
 				z
 					.string()
 					.min(1, { message: 'token must be at least 1 character' })
-					.describe('useAuth token')
+					.describe('useAuth token'),
 			)
 			.describe('array of useAuth tokens')
 			.parse(tokensRaw)

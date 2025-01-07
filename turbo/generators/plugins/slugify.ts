@@ -289,14 +289,14 @@ function upperFactory(locale: Locale): (input: string) => string {
 
 function capitalCaseTransformFactory(
 	lower: (input: string) => string,
-	upper: (input: string) => string
+	upper: (input: string) => string,
 ) {
 	return (word: string) => `${upper(word[0])}${lower(word.slice(1))}`
 }
 
 function pascalCaseTransformFactory(
 	lower: (input: string) => string,
-	upper: (input: string) => string
+	upper: (input: string) => string,
 ) {
 	return (word: string, index: number) => {
 		const char0 = word[0]

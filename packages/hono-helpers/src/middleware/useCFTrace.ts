@@ -25,7 +25,7 @@ export function useCFTrace<T extends HonoApp>(timeoutMs = 200) {
 						.addAttachment({
 							filename: 'cfTrace.json',
 							data: JSON.stringify(trace),
-						})
+						}),
 				)
 			} catch (e) {
 				span?.setTag('error', true)

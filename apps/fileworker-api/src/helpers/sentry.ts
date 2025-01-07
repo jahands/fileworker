@@ -5,7 +5,7 @@ import type { Bindings } from '../types'
 export function initSentry(
 	request: Request,
 	env: Pick<Bindings, 'SENTRY_DSN' | 'SENTRY_RELEASE' | 'ENVIRONMENT'>,
-	ctx: Pick<ExecutionContext, 'waitUntil'>
+	ctx: Pick<ExecutionContext, 'waitUntil'>,
 ): Toucan {
 	return new Toucan({
 		dsn: env.SENTRY_DSN,

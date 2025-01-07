@@ -28,7 +28,7 @@ export function validateArg<T extends ZodTypeAny>(validator: T, cmd?: Command) {
 export function parseArg<T extends ZodTypeAny>(
 	s: string,
 	validator: T,
-	cmd?: Command
+	cmd?: Command,
 ): ReturnType<T['parse']> {
 	try {
 		return validator.parse(s)

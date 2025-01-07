@@ -87,7 +87,7 @@ describe('middleware', () => {
 					body: JSON.stringify({ foo: 'foo1' }),
 				})
 				expect(await res.text()).toMatchInlineSnapshot(
-					`"Invalid HTTP header: Content-Type=text/plain;charset=UTF-8"`
+					`"Invalid HTTP header: Content-Type=text/plain;charset=UTF-8"`,
 				)
 				expect(res.status).toBe(400)
 			})
@@ -161,7 +161,7 @@ describe('middleware', () => {
 					async (c) => {
 						const { bar, baz } = c.req.valid('param')
 						return c.text(`${bar}, ${baz}`)
-					}
+					},
 				)
 				const res = await getResponse('/foo/bar/baz')
 				expect(await res.text()).toBe('bar, baz')
@@ -176,7 +176,7 @@ describe('middleware', () => {
 					async (c) => {
 						const { bar, baz, qux } = c.req.valid('param')
 						return c.text(`${bar}, ${baz}, ${qux}`)
-					}
+					},
 				)
 				const res = await getResponse('/foo/bar1/true/123')
 				expect(await res.text()).toBe('bar1, true, 123')
@@ -192,7 +192,7 @@ describe('middleware', () => {
 						const { bar } = c.req.valid('param')
 						expect(typeof bar).toBe('number')
 						return c.text(bar.toString())
-					}
+					},
 				)
 				const res = await getResponse('/foo/123')
 				expect(await res.text()).toBe('123')
@@ -304,7 +304,7 @@ describe('middleware', () => {
 						const { bar } = c.req.valid('param')
 						const { baz } = c.req.valid('query')
 						return c.text(`${bar}, ${baz}`)
-					}
+					},
 				)
 				const res = await getResponse('/foo/bar1?baz=baz1')
 				expect(await res.text()).toBe('bar1, baz1')

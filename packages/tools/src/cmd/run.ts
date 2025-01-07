@@ -12,7 +12,7 @@ export const runCmd = new Command('run')
 	.requiredOption(
 		'-F, --filter <string>',
 		'filter preset for which packages to run within',
-		validateArg(z.enum(['with-wrangler-config']))
+		validateArg(z.enum(['with-wrangler-config'])),
 	)
 	.option('-y, --yes', 'Auto-confirm to run within dirs', false)
 	.argument('<cmd...>', 'command to run - recommend adding -- first')

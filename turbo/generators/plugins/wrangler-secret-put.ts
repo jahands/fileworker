@@ -10,7 +10,7 @@ const didSucceed = (code: number) => `${code}` === '0'
 export function wranglerSecretPut(
 	answers: Answers,
 	config: { data: { name: string } },
-	_plop: PlopTypes.NodePlopAPI
+	_plop: PlopTypes.NodePlopAPI,
 ) {
 	return new Promise((resolve, reject) => {
 		console.log(`Enter secret for ${config.data.name}`)
@@ -21,7 +21,7 @@ export function wranglerSecretPut(
 				cwd: answers.turbo.paths.root,
 				stdio: 'inherit',
 				shell: true,
-			}
+			},
 		)
 
 		proc.on('close', (code: number) => {

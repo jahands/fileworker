@@ -23,11 +23,11 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 	plop.setActionType('updateGitHubActions', updateGitHubActions as PlopTypes.CustomActionFunction)
 	plop.setActionType(
 		'wranglerSecretPut',
-		wranglerSecretPut as unknown as PlopTypes.CustomActionFunction
+		wranglerSecretPut as unknown as PlopTypes.CustomActionFunction,
 	)
 	plop.setActionType(
 		'writeWorkflowsApiTokens',
-		writeWorkflowsApiTokens as PlopTypes.CustomActionFunction
+		writeWorkflowsApiTokens as PlopTypes.CustomActionFunction,
 	)
 
 	plop.setHelper('slug', slugifyText)
@@ -57,7 +57,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					if (process.env.ALLOW_DUPES !== '1') {
 						const workerName = slugifyText(input)
 						console.log(
-							`\n🌀 Ensuring worker "${workerName}" doesn't exist in your Cloudflare account...`
+							`\n🌀 Ensuring worker "${workerName}" doesn't exist in your Cloudflare account...`,
 						)
 						if (!isWorkerNameUnique(workerName)) {
 							return 'Worker already exists in your account!'
@@ -119,7 +119,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					{
 						type: 'wranglerSecretPut',
 						data: { name: 'AXIOM_API_KEY' },
-					}
+					},
 				)
 
 				if (answers.useAuth === 'yes') {
@@ -153,7 +153,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					if (process.env.ALLOW_DUPES !== '1') {
 						const workerName = slugifyText(input)
 						console.log(
-							`\n🌀 Ensuring worker "${workerName}" doesn't exist in your Cloudflare account...`
+							`\n🌀 Ensuring worker "${workerName}" doesn't exist in your Cloudflare account...`,
 						)
 						if (!isWorkerNameUnique(workerName)) {
 							return 'Worker already exists in your account!'
@@ -205,7 +205,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
 					},
 					{
 						type: 'writeWorkflowsApiTokens',
-					}
+					},
 				)
 			}
 

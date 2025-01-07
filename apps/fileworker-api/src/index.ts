@@ -19,7 +19,7 @@ const app = new Hono<App>()
 		'*', // Middleware
 		useMeta,
 		useSentry(initSentry, 'http.server'),
-		useAxiomLogger
+		useAxiomLogger,
 	)
 
 	// Hooks

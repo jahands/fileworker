@@ -36,7 +36,7 @@ export function useOnError<T extends HonoApp>() {
 				success: false,
 				error: { message: 'internal server error' },
 			} satisfies APIError,
-			500
+			500,
 		)
 	}
 }
