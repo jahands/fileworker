@@ -1,52 +1,52 @@
 {
-	"name": "workers-monorepo",
-	"version": "1.0.0",
-	"private": true,
-	"sideEffects": false,
-	"scripts": {
-		"changeset:new": "run-changeset-new",
-		"check:ci": "turbo check:ci --log-order=grouped",
-		"test:ci": "run-vitest-ci",
-		"check:deps": "pnpm syncpack lint",
-		"check:format": "prettier . --check --cache --ignore-unknown",
-		"chore:update:deps": "run-update-deps",
-		"chore:update:tools": "run-s chore:update:tools:* fix:deps",
-		"chore:update:tools:pnpm": "runx update-pnpm",
-		"chore:update:tools:turbo": "pnpx @turbo/codemod@latest update",
-		"fix": "run-s fix:*",
-		"fix:deps": "run-fix-deps",
-		"fix:lint": "FIX_ESLINT=1 pnpm turbo check:lint",
-		"fix:format": "prettier . --write --cache --ignore-unknown"
-	},
-	"devDependencies": {
-		"@changesets/cli": "2.27.11",
-		"@ianvs/prettier-plugin-sort-imports": "4.4.0",
-		"@repo/eslint-config": "workspace:*",
-		"@repo/tools": "workspace:*",
-		"@repo/typescript-config": "workspace:*",
-		"@sentry/cli": "2.39.1",
-		"@turbo/gen": "2.3.3",
-		"@vitest/ui": "2.1.8",
-		"change-case": "5.4.4",
-		"npm-run-all2": "7.0.2",
-		"prettier": "3.4.2",
-		"prettier-plugin-multiline-arrays": "^4.0.2",
-		"prettier-plugin-packagejson": "2.5.6",
-		"slugify": "1.6.6",
-		"syncpack": "13.0.0",
-		"tsx": "4.19.2",
-		"turbo": "2.3.3",
-		"typescript": "5.5.4",
-		"vitest": "2.1.8",
-		"wrangler": "3.99.0",
-		"yaml": "2.6.1",
-		"zod": "3.24.1",
-		"zx": "8.2.4"
-	},
-	"packageManager": "pnpm@9.12.3",
-	"pnpm": {
-		"overrides": {
-			"@types/node": "20.8.3"
-		}
-	}
+  "name": "workers-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "changeset:new": "run-changeset-new",
+    "check:ci": "turbo check:ci --log-order=grouped",
+    "test:ci": "run-vitest-ci",
+    "check:deps": "pnpm syncpack lint",
+    "check:format": "prettier . --check --cache --ignore-unknown",
+    "chore:update:deps": "run-update-deps",
+    "chore:update:tools": "run-s chore:update:tools:* fix:deps",
+    "chore:update:tools:pnpm": "runx update-pnpm",
+    "chore:update:tools:turbo": "pnpx @turbo/codemod@latest update",
+    "fix": "run-s fix:*",
+    "fix:deps": "run-fix-deps",
+    "fix:lint": "FIX_ESLINT=1 pnpm turbo check:lint",
+    "fix:format": "prettier . --write --cache --ignore-unknown"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.27.11",
+    "@ianvs/prettier-plugin-sort-imports": "4.4.0",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tools": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@sentry/cli": "2.39.1",
+    "@turbo/gen": "2.3.3",
+    "@vitest/ui": "2.1.8",
+    "change-case": "5.4.4",
+    "npm-run-all2": "7.0.2",
+    "prettier": "3.4.2",
+    "prettier-plugin-multiline-arrays": "^4.0.2",
+    "prettier-plugin-packagejson": "2.5.6",
+    "slugify": "1.6.6",
+    "syncpack": "13.0.0",
+    "tsx": "4.19.2",
+    "turbo": "2.3.3",
+    "typescript": "5.5.4",
+    "vitest": "2.1.8",
+    "wrangler": "3.99.0",
+    "yaml": "2.6.1",
+    "zod": "3.24.1",
+    "zx": "8.2.4"
+  },
+  "packageManager": "pnpm@9.12.3",
+  "pnpm": {
+    "overrides": {
+      "@types/node": "20.8.3"
+    }
+  }
 }

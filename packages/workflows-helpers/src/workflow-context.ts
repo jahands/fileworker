@@ -97,7 +97,7 @@ class WorkflowContextBase<Bindings extends SharedHonoBindings, Params = unknown>
 					invocationId: ulid(),
 				},
 			},
-			callback
+			callback,
 		)
 	}
 
@@ -131,7 +131,7 @@ class WorkflowContextBase<Bindings extends SharedHonoBindings, Params = unknown>
 					`running workflow ${this.workflowName} with params: ${JSON.stringify(this.event.payload)}`,
 					{
 						msc: { params: this.event.payload },
-					}
+					},
 				)
 
 				await callback()
@@ -173,12 +173,12 @@ class WorkflowContextStep<
 	async do<T extends Rpc.Serializable<T>>(
 		name: string,
 		config: WorkflowStepConfig,
-		callback: () => Promise<T>
+		callback: () => Promise<T>,
 	): Promise<T>
 	async do<T extends Rpc.Serializable<T>>(
 		name: string,
 		configOrCallback: WorkflowStepConfig | (() => Promise<T>),
-		callback?: () => Promise<T>
+		callback?: () => Promise<T>,
 	): Promise<T> {
 		return await this.withLogger(async () => {
 			let config: WorkflowStepConfig
@@ -240,7 +240,7 @@ class WorkflowContextStep<
 						onFailedAttempt: (e) => {
 							this.sentry.captureException(e)
 						},
-					}
+					},
 				)
 			} catch (e) {
 				this.logger.error(`workflow step failed: ${name}`)

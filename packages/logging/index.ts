@@ -362,7 +362,7 @@ export class AxiomLogger {
 								data: logsBody,
 							})
 						this.sentry?.captureException(
-							new Error(`Axiom failed to ingest logs: ${res.status} ${res.statusText}`)
+							new Error(`Axiom failed to ingest logs: ${res.status} ${res.statusText}`),
 						)
 						if (this.state && res.status === 400) {
 							// Must have goofed up something. Delete logs

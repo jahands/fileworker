@@ -9,7 +9,7 @@ deployCmd
 	.description('Deploy a Workers project with Wrangler')
 	.option(
 		'--no-output',
-		`Don't output to ./dist directory (useful for frameworks with their own build.) `
+		`Don't output to ./dist directory (useful for frameworks with their own build.) `,
 	)
 	.action(async ({ output }) => {
 		const cfg = await getConfig()
@@ -28,7 +28,7 @@ deployCmd
 deployCmd
 	.command('pages')
 	.description(
-		'Deploy a Pages project using Wrangler. Note: may need tweeking to work with non-Remix projects.'
+		'Deploy a Pages project using Wrangler. Note: may need tweeking to work with non-Remix projects.',
 	)
 	.argument('<project>', 'Pages project name to deploy', (p) => p)
 	.action(async (project) => {
@@ -38,6 +38,6 @@ deployCmd
 		await retry(
 			3,
 			'1s',
-			() => $`wrangler pages deploy ./build/client --commit-dirty=true --project-name ${project}`
+			() => $`wrangler pages deploy ./build/client --commit-dirty=true --project-name ${project}`,
 		)
 	})

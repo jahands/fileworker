@@ -20,7 +20,7 @@ export const updatePnpmCmd = new Command('update-pnpm').action(async () => {
 	let versionUpdated = false
 	const packageJsonPath = `${repoRoot}/package.json`
 	const packageJson = PackageJson.parse(
-		JSON.parse(await fs.readFile(packageJsonPath).then((b) => b.toString()))
+		JSON.parse(await fs.readFile(packageJsonPath).then((b) => b.toString())),
 	)
 	if (packageJson.packageManager !== `pnpm@${latest}`) {
 		echo(chalk.blue(`Updating package.json to pnpm@${latest}`))
@@ -30,7 +30,7 @@ export const updatePnpmCmd = new Command('update-pnpm').action(async () => {
 	}
 
 	const miseToml = MiseToml.parse(
-		toml.parse(await fs.readFile(`${repoRoot}/.mise.toml`).then((b) => b.toString()))
+		toml.parse(await fs.readFile(`${repoRoot}/.mise.toml`).then((b) => b.toString())),
 	)
 	if (miseToml.tools.pnpm !== latest) {
 		echo(chalk.blue(`Updating .mise.toml to pnpm@${latest}`))

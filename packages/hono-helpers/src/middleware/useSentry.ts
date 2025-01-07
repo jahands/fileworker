@@ -14,9 +14,9 @@ export function useSentry<T extends HonoApp>(
 	initSentry: (
 		request: Request,
 		env: T['Bindings'],
-		ctx: Pick<ExecutionContext, 'waitUntil'>
+		ctx: Pick<ExecutionContext, 'waitUntil'>,
 	) => Toucan | undefined,
-	transactionOp: string
+	transactionOp: string,
 ) {
 	return async (c: Context<T>, next: Next): Promise<void> => {
 		if (c.env.ENVIRONMENT === 'production') {
@@ -84,7 +84,7 @@ export function initSentry(options?: InitSentryOptions) {
 	return (
 		request: Request,
 		env: Pick<SharedHonoBindings, 'SENTRY_DSN' | 'SENTRY_RELEASE' | 'ENVIRONMENT'>,
-		ctx: Pick<ExecutionContext, 'waitUntil'>
+		ctx: Pick<ExecutionContext, 'waitUntil'>,
 	): Toucan => {
 		return new Toucan({
 			dsn: env.SENTRY_DSN,

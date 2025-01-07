@@ -24,7 +24,7 @@ sentryCmd
 			3,
 			'1s',
 			() =>
-				$`sentry-cli releases set-commits ${cfg.version} --auto --ignore-missing --org ${org} --project ${project}`
+				$`sentry-cli releases set-commits ${cfg.version} --auto --ignore-missing --org ${org} --project ${project}`,
 		)
 	})
 
@@ -42,7 +42,7 @@ sentryCmd
 			3,
 			'1s',
 			() =>
-				$`sentry-cli sourcemaps upload ./dist/ --strip-prefix './dist/../' --release ${cfg.version} --org ${org} --project ${project}`
+				$`sentry-cli sourcemaps upload ./dist/ --strip-prefix './dist/../' --release ${cfg.version} --org ${org} --project ${project}`,
 		)
 	})
 
@@ -59,6 +59,6 @@ sentryCmd
 		await retry(
 			3,
 			'1s',
-			() => $`sentry-cli releases finalize ${cfg.version} --org ${org} --project ${project}`
+			() => $`sentry-cli releases finalize ${cfg.version} --org ${org} --project ${project}`,
 		)
 	})
