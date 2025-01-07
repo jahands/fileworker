@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { Heading, P } from 'flowbite-svelte'
-	import { Button, Input, Label } from 'flowbite-svelte';
+	import { Button, Heading, Input, Label, P, Spinner } from 'flowbite-svelte';
+	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
+
+	let alertFeed: AlertFeed;
 
 	let fileIdentifier = $state("")
 	let fileDeletionToken = $state("")
@@ -16,10 +18,23 @@
 					deletionToken: fileDeletionToken
 				}),
 			})
-			const respText = await resp.text()
-			alert(`Response was ${respText}`)
+			switch (resp.status) {
+				case 200:
+				case 202:
+				case 204:
+					alertFeed.showAlert(`File "${fileIdentifier}" deletion successful. Ready to delete more.`, { type: 'success' })
+					fileIdentifier = ""
+					fileDeletionToken = ""
+					break
+				case 404:
+					alertFeed.showAlert(`File "${fileIdentifier}" not found.`, { type: 'warning' })
+					break
+				default:
+					alertFeed.showAlert(`File "${fileIdentifier}" deletion error.`, { type: 'error' })
+					break
+			}
 		} finally {
-			submitting = false;
+			submitting = false
 		}
 	}
 </script>
@@ -31,7 +46,7 @@
 <Body>
 	<Heading tag="h2" class="mb-4">Deletion page</Heading>
 	<P class="mb-4">Search for a file to delete.</P>
-	<form onsubmit={submit}>
+	<form class="mb-4" onsubmit={submit}>
 		<div class="mb-4">
 			<div>
 				<Label class="mb-2">File identifier</Label>
@@ -45,11 +60,12 @@
 		<div class="text-center">
 			<Button type="submit" disabled={submitting}>
 				{#if submitting}
-					Submitting...
+					<Spinner class="me-4" color="white" size=4 />Deleting...
 				{:else}
-					Submit
+					Delete
 				{/if}
 			</Button>
 		</div>
 	</form>
+	<AlertFeed bind:this={alertFeed} />
 </Body>
