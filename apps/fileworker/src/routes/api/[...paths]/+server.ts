@@ -1,6 +1,6 @@
-import { router } from '$lib/api'
+import { routeHandler } from '$lib/api'
 
 import type { RequestHandler } from '@sveltejs/kit'
 
-export const GET: RequestHandler = ({ request }) => router.fetch(request)
-export const DELETE: RequestHandler = ({ request }) => router.fetch(request)
+export const GET: RequestHandler = routeHandler
+export const DELETE: RequestHandler = routeHandler
