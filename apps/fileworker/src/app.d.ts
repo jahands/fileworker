@@ -10,4 +10,8 @@ declare global {
 	}
 }
 
+export type Env = {
+	R2: R2Bucket
+}
+
 export {}
