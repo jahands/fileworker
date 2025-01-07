@@ -10,4 +10,13 @@ declare global {
 	}
 }
 
+export type Env = {
+	// R2: R2Bucket
+}
+
+export type HonoApp = {
+	Bindings: Env
+	Variables: undefined
+}
+
 export {}
