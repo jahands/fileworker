@@ -41,7 +41,11 @@
     "wrangler": "^3.99.0"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@tailwindcss/forms": "^0.5.9",
-    "@tailwindcss/typography": "^0.5.15"
+    "@tailwindcss/typography": "^0.5.15",
+    "flowbite": "^2.5.2",
+    "flowbite-svelte": "^0.47.4",
+    "tailwind-merge": "^2.6.0"
   }
 }
