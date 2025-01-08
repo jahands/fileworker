@@ -1,36 +1,38 @@
 <script lang="ts">
-	import { Button, Heading, Input, Label, P, Spinner } from 'flowbite-svelte';
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
+	import { Button, Heading, Input, Label, P, Spinner } from 'flowbite-svelte'
 
-	let alertFeed: AlertFeed;
+	let alertFeed: AlertFeed
 
-	let fileIdentifier = $state("")
-	let fileDeletionToken = $state("")
-	let submitting = $state(false);
+	let file_id = $state('')
+	let fileDeletionToken = $state('')
+	let submitting = $state(false)
 
 	async function submit() {
-		submitting = true;
+		submitting = true
 		try {
-			const resp = await fetch(`/api/file/${fileIdentifier}`, {
+			const resp = await fetch(`/api/file/${file_id}`, {
 				method: 'DELETE',
 				body: JSON.stringify({
-					deletionToken: fileDeletionToken
+					deletionToken: fileDeletionToken,
 				}),
 			})
 			switch (resp.status) {
 				case 200:
 				case 202:
 				case 204:
-					alertFeed.showAlert(`File "${fileIdentifier}" deletion successful. Ready to delete more.`, { type: 'success' })
-					fileIdentifier = ""
-					fileDeletionToken = ""
+					alertFeed.showAlert(`File "${file_id}" deletion successful. Ready to delete more.`, {
+						type: 'success',
+					})
+					file_id = ''
+					fileDeletionToken = ''
 					break
 				case 404:
-					alertFeed.showAlert(`File "${fileIdentifier}" not found.`, { type: 'warning' })
+					alertFeed.showAlert(`File "${file_id}" not found.`, { type: 'warning' })
 					break
 				default:
-					alertFeed.showAlert(`File "${fileIdentifier}" deletion error.`, { type: 'error' })
+					alertFeed.showAlert(`File "${file_id}" deletion error.`, { type: 'error' })
 					break
 			}
 		} finally {
@@ -40,7 +42,7 @@
 </script>
 
 <svelte:head>
-    <title>Deletion</title>
+	<title>Deletion</title>
 </svelte:head>
 
 <Body>
@@ -50,17 +52,31 @@
 		<div class="mb-4">
 			<div>
 				<Label class="mb-2">File identifier</Label>
-				<Input type="text" id="file_id" bind:value={fileIdentifier} placeholder="File identifier" class="mb-2" required />
+				<Input
+					type="text"
+					id="file_id"
+					bind:value={file_id}
+					placeholder="File identifier"
+					class="mb-2"
+					required
+				/>
 			</div>
 			<div>
 				<Label class="mb-2">Deletion token</Label>
-				<Input type="text" id="file_delete_token" bind:value={fileDeletionToken} placeholder="Deletion token" class="mb-2" required />
+				<Input
+					type="text"
+					id="file_delete_token"
+					bind:value={fileDeletionToken}
+					placeholder="Deletion token"
+					class="mb-2"
+					required
+				/>
 			</div>
 		</div>
 		<div class="text-center">
 			<Button type="submit" disabled={submitting}>
 				{#if submitting}
-					<Spinner class="me-4" color="white" size=4 />Deleting...
+					<Spinner class="me-4" color="white" size="4" />Deleting...
 				{:else}
 					Delete
 				{/if}

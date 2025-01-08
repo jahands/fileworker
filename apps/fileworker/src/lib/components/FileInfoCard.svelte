@@ -1,36 +1,42 @@
 <script lang="ts">
-	import { Card } from 'flowbite-svelte'
-	import { Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte';
 	import { page } from '$app/state'
+	import { Card, Table, TableBody, TableBodyCell, TableBodyRow } from 'flowbite-svelte'
 
-	let { fileIdentifier, filename, deletionToken, showDownload = true, showCommand = true, ...rest }: {
-		fileIdentifier: string,
-		filename: string,
-		deletionToken?: String,
-		showDownload?: boolean,
-		showCommand?: boolean,
-		[key: string]: unknown,
+	let {
+		file_id,
+		filename,
+		deletionToken,
+		showDownload = true,
+		showCommand = true,
+		...rest
+	}: {
+		file_id: string
+		filename: string
+		deletionToken?: String
+		showDownload?: boolean
+		showCommand?: boolean
+		[key: string]: unknown
 	} = $props()
 
 	const url = $derived.by(() => {
 		let url = new URL(page.url)
-		url.pathname = `/api/file/${fileIdentifier}/${filename}`
+		url.pathname = `/api/file/${file_id}/${filename}`
 		return url
 	})
 
 	const urlAlt = $derived.by(() => {
 		let url = new URL(page.url)
-		url.pathname = `/${fileIdentifier}/${filename}`
+		url.pathname = `/${file_id}/${filename}`
 		return url
 	})
 </script>
 
 <Card {...rest}>
-	<Table >
+	<Table>
 		<TableBody>
 			<TableBodyRow>
 				<TableBodyCell>Identifier</TableBodyCell>
-				<TableBodyCell>{fileIdentifier}</TableBodyCell>
+				<TableBodyCell>{file_id}</TableBodyCell>
 			</TableBodyRow>
 			<TableBodyRow>
 				<TableBodyCell>Filename</TableBodyCell>
@@ -46,13 +52,17 @@
 				<TableBodyRow>
 					<TableBodyCell>Download URL</TableBodyCell>
 					<TableBodyCell>
-						<a class="font-medium text-primary-600 hover:underline" href="{url.toString()}">Download</a>
+						<a class="font-medium text-primary-600 hover:underline" href={url.toString()}
+							>Download</a
+						>
 					</TableBodyCell>
 				</TableBodyRow>
 				<TableBodyRow>
 					<TableBodyCell>Download URL (alt)</TableBodyCell>
 					<TableBodyCell>
-						<a class="font-medium text-primary-600 hover:underline" href="{urlAlt.toString()}">Download</a>
+						<a class="font-medium text-primary-600 hover:underline" href={urlAlt.toString()}
+							>Download</a
+						>
 					</TableBodyCell>
 				</TableBodyRow>
 			{/if}
