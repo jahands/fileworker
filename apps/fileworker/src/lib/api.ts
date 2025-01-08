@@ -24,6 +24,19 @@ export type Router = typeof router
 export const router = new Hono<HonoApp>()
 
 	.get(
+		'/api/file/search/:file_id?',
+		zValidator(
+			'param',
+			z.object({
+				file_id: z.string(),
+			}),
+		),
+		async (c) => {
+			return c.json({ filename: `placeholder.txt` })
+		},
+	)
+
+	.get(
 		'/api/file/:file_id/:filename?',
 		zValidator(
 			'param',

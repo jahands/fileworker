@@ -19,6 +19,7 @@
 		<NavHamburger on:click={toggle} />
 		<NavUl {activeUrl} {hidden}>
 			<NavLi href="/front/upload">Upload</NavLi>
+			<NavLi href="/front/download">Download</NavLi>
 			<NavLi href="/front/deletion">Deletion</NavLi>
 		</NavUl>
 	</Navbar>
