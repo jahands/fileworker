@@ -32,6 +32,14 @@ export class TestClient {
 	}
 
 	/**
+	 * GET /api/file/search/:file_id
+	 */
+	async searchFile(fileId: string): Promise<Response> {
+		let url = route(`/api/file/search/${fileId}`)
+		return SELF.fetch(url)
+	}
+
+	/**
 	 * DELETE /api/file/:file_id/:filename
 	 */
 	async deleteFile(fileId: string): Promise<Response> {
