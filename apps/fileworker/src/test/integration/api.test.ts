@@ -16,7 +16,7 @@ describe('PUT /api/file', async () => {
 	})
 })
 
-describe('GET /:file_id/:filename?', async () => {
+describe('GET /:file_id/:filename', async () => {
 	it('returns 404 for invalid file', async ({ h }) => {
 		const res = await h.client.downloadFile('abc', 'file.txt')
 		expect(res.status).toBe(404)
@@ -34,14 +34,14 @@ describe('GET /:file_id/:filename?', async () => {
 	})
 })
 
-describe('GET /:file_id/:filename?', async () => {
+describe('GET /api/file/:file_id/:filename', async () => {
 	it('returns 404 for invalid file', async ({ h }) => {
-		const res = await h.client.deleteFile('abcd')
+		const res = await h.client.downloadFileAPI('abc', 'file.txt')
 		expect(res.status).toBe(404)
 		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
 	})
 
-	it('deletes uploaded file', async ({ h }) => {
+	it('downloads uploaded file', async ({ h }) => {
 		const res = await h.client.uploadFile('hello3.txt', 'world3')
 		expect(res.status).toBe(httpStatus.OK)
 		const downloadUrl = await res.text()
@@ -49,6 +49,24 @@ describe('GET /:file_id/:filename?', async () => {
 		// download it
 		const res2 = await h.client.fetch(downloadUrl)
 		expect(await res2.text()).toBe('world3')
+	})
+})
+
+describe('DELETE /api/file/:file_id', async () => {
+	it('returns 404 for invalid file', async ({ h }) => {
+		const res = await h.client.deleteFile('abcd')
+		expect(res.status).toBe(404)
+		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
+	})
+
+	it('deletes uploaded file', async ({ h }) => {
+		const res = await h.client.uploadFile('hello4.txt', 'world4')
+		expect(res.status).toBe(httpStatus.OK)
+		const downloadUrl = await res.text()
+
+		// download it
+		const res2 = await h.client.fetch(downloadUrl)
+		expect(await res2.text()).toBe('world4')
 
 		// delete it
 		await h.client.deleteFile(getIdFromDownloadUrl(downloadUrl))
