@@ -11,7 +11,7 @@ declare global {
 }
 
 export type Env = {
-	// R2: R2Bucket
+	R2: R2Bucket
 }
 
 export type HonoApp = {
