@@ -15,6 +15,17 @@ export const GetFileParams = z.object({
 	filename: z.string(),
 })
 
+export type SearchFileResponse = z.infer<typeof SearchFileResponse>
+export const SearchFileResponse = z.object({
+	filename: z.string().min(1),
+})
+
+/** Custom metadata for files in R2 */
+export type R2FileMetadata = z.infer<typeof R2FileMetadata>
+export const R2FileMetadata = z.object({
+	filename: z.string().min(1),
+})
+
 export const routeHandler: RequestHandler = ({ request, platform }) => {
 	if (!platform) {
 		return errorMissingPlatform()
@@ -34,20 +45,13 @@ export const router = new Hono<HonoApp>()
 			}),
 		),
 		async (c) => {
-			return c.json({ filename: `placeholder.txt` })
-		},
-	)
-
-	.get(
-		'/api/file/search/:file_id?',
-		zValidator(
-			'param',
-			z.object({
-				file_id: z.string(),
-			}),
-		),
-		async (c) => {
-			return c.json({ filename: `placeholder.txt` })
+			const { file_id } = c.req.valid('param')
+			const res = await c.env.R2.head(`files/${file_id}`)
+			if (!res) {
+				return c.notFound()
+			}
+			const { filename } = R2FileMetadata.parse(res.customMetadata)
+			return c.json({ filename })
 		},
 	)
 
@@ -65,11 +69,11 @@ export const router = new Hono<HonoApp>()
 			// todo: use a shorter ID and record to DB
 			const id = crypto.randomUUID()
 			await c.env.R2.put(`files/${id}`, file, {
-				customMetadata: {
+				customMetadata: R2FileMetadata.parse({
 					filename,
-				},
+				} satisfies R2FileMetadata),
 			})
-			return c.json({fileIdentifier: id, fileName: filename})
+			return c.json({ fileIdentifier: id, fileName: filename })
 		},
 	)
 

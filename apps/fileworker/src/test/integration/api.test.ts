@@ -1,3 +1,4 @@
+import { SearchFileResponse } from '$lib/api'
 import { env } from 'cloudflare:test'
 import { httpStatus } from 'http-codex/status'
 import { assert, describe, expect, test } from 'vitest'
@@ -52,6 +53,30 @@ describe('GET /api/file/:file_id/:filename', async () => {
 	})
 })
 
+describe('GET /api/file/search/:file_id', async () => {
+	it('returns 404 for invalid file id', async ({ h }) => {
+		const res = await h.client.searchFile('abc')
+		expect(res.status).toBe(404)
+		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
+	})
+
+	it('returns filename for existing file', async ({ h }) => {
+		const res = await h.client.uploadFile('hello4.txt', 'world4')
+		expect(res.status).toBe(httpStatus.OK)
+		const downloadUrl = await res.text()
+
+		const fileId = getIdFromDownloadUrl(downloadUrl)
+		assert(fileId.length > 0)
+
+		// search for the file
+		const res2 = await h.client.searchFile(fileId)
+		expect(res2.status).toBe(httpStatus.OK)
+		const body = await res2.json()
+		const { filename } = SearchFileResponse.parse(body)
+		expect(filename).toBe('hello4.txt')
+	})
+})
+
 describe('DELETE /api/file/:file_id', async () => {
 	it('returns 404 for invalid file', async ({ h }) => {
 		const res = await h.client.deleteFile('abcd')
@@ -60,13 +85,13 @@ describe('DELETE /api/file/:file_id', async () => {
 	})
 
 	it('deletes uploaded file', async ({ h }) => {
-		const res = await h.client.uploadFile('hello4.txt', 'world4')
+		const res = await h.client.uploadFile('hello5.txt', 'world5')
 		expect(res.status).toBe(httpStatus.OK)
 		const downloadUrl = await res.text()
 
 		// download it
 		const res2 = await h.client.fetch(downloadUrl)
-		expect(await res2.text()).toBe('world4')
+		expect(await res2.text()).toBe('world5')
 
 		// delete it
 		await h.client.deleteFile(getIdFromDownloadUrl(downloadUrl))
