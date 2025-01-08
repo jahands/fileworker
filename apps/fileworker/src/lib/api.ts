@@ -61,16 +61,15 @@ export const router = new Hono<HonoApp>()
 		),
 		async (c) => {
 			const { filename } = c.req.valid('param')
-			const url = new URL(c.req.url)
-
+			const file = await c.req.blob()
 			// todo: use a shorter ID and record to DB
 			const id = crypto.randomUUID()
-			await c.env.R2.put(`files/${id}`, c.req.raw.body, {
+			await c.env.R2.put(`files/${id}`, file, {
 				customMetadata: {
 					filename,
 				},
 			})
-			return c.text(`${url.origin}/${id}/${filename}`)
+			return c.json({fileIdentifier: id, fileName: filename})
 		},
 	)
 
