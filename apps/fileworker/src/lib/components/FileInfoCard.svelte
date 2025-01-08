@@ -31,7 +31,7 @@
 	})
 </script>
 
-<Card {...rest}>
+<Card {...rest} class="max-w-full">
 	<Table>
 		<TableBody>
 			<TableBodyRow>

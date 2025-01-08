@@ -73,7 +73,7 @@ export const router = new Hono<HonoApp>()
 					filename,
 				} satisfies R2FileMetadata),
 			})
-			return c.json({ file_id: id, fileName: filename })
+			return c.json({ file_id: id, filename: filename })
 		},
 	)
 
