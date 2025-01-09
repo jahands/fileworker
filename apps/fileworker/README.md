@@ -19,7 +19,11 @@ npm run db:migrations:generate
 Run migrations:
 
 ```bash
-npm run db:migrations:apply
+# Apply to local dev DB:
+npm run db:migrations:apply:local
+
+# Apply to remote DB:
+npm run db:migrations:apply:remote
 ```
 
 ## Developing
