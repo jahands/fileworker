@@ -26,6 +26,7 @@ export type UploadFileResponse = z.infer<typeof UploadFileResponse>
 export const UploadFileResponse = z.object({
 	file_id: z.string().min(1),
 	filename: z.string().min(1),
+	expires_on: z.coerce.date(),
 })
 
 /** Custom metadata for files in R2 */
@@ -91,9 +92,11 @@ export const router = new Hono<HonoApp>()
 			const { filename } = c.req.valid('param')
 			const { expiration_ttl } = c.req.valid('query')
 			const file = await c.req.blob()
+
+			const expires_on = new Date(Date.now() + expiration_ttl * 1000)
 			const { file_id } = await c.var.store.insertFile({
 				filename,
-				expires_on: new Date(Date.now() + expiration_ttl * 1000),
+				expires_on,
 			})
 
 			await c.env.R2.put(`files/${file_id}`, file, {
@@ -106,6 +109,7 @@ export const router = new Hono<HonoApp>()
 				UploadFileResponse.parse({
 					file_id,
 					filename,
+					expires_on,
 				} satisfies UploadFileResponse),
 			)
 		},
