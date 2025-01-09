@@ -3,6 +3,7 @@
 	import Body from '$lib/components/Body.svelte'
 	import FileInfoCard from '$lib/components/FileInfoCard.svelte'
 	import { Dropzone, Fileupload, Heading, Helper, Label, P, Spinner } from 'flowbite-svelte'
+	import UploadInfoCard from '$lib/components/UploadInfoCard.svelte';
 
 	let alertFeed: AlertFeed
 
@@ -123,7 +124,7 @@
 
 	{#if file_id !== ''}
 		<div class="mb-4">
-			<FileInfoCard class="mx-auto" showDownload={true} {file_id} {filename} />
+			<UploadInfoCard class="mx-auto" showDownload={true} {file_id} {filename} deletionToken="test" />
 		</div>
 	{/if}
 </Body>
