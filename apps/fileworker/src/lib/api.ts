@@ -26,6 +26,7 @@ export type UploadFileResponse = z.infer<typeof UploadFileResponse>
 export const UploadFileResponse = z.object({
 	file_id: z.string().min(1),
 	filename: z.string().min(1),
+	expires_on: z.coerce.date(),
 })
 
 /** Custom metadata for files in R2 */
@@ -77,22 +78,38 @@ export const router = new Hono<HonoApp>()
 				filename: z.string(),
 			}),
 		),
+		zValidator(
+			'query',
+			z.object({
+				expiration_ttl: z.coerce
+					.number()
+					.min(1)
+					.default(60 * 60 * 24)
+					.describe('number of seconds the file is valid for (defaults to 1 day)'),
+			}),
+		),
 		async (c) => {
 			const { filename } = c.req.valid('param')
+			const { expiration_ttl } = c.req.valid('query')
 			const file = await c.req.blob()
+
+			const expires_on = new Date(Date.now() + expiration_ttl * 1000)
 			const { file_id } = await c.var.store.insertFile({
 				filename,
-				expires_on: datePlus('1 day'),
+				expires_on,
 			})
+
 			await c.env.R2.put(`files/${file_id}`, file, {
 				customMetadata: R2FileMetadata.parse({
 					filename,
 				} satisfies R2FileMetadata),
 			})
+
 			return c.json(
 				UploadFileResponse.parse({
 					file_id,
 					filename,
+					expires_on,
 				} satisfies UploadFileResponse),
 			)
 		},
@@ -138,11 +155,19 @@ export const router = new Hono<HonoApp>()
 		),
 		async (c) => {
 			const { file_id } = c.req.valid('param')
-			const meta = await c.env.R2.head(`files/${file_id}`)
-			if (!meta) {
+
+			// Always ensure it's deleted from R2, even if it doesn't
+			// exist in DB (just in case we got in a bad state).
+			await c.env.R2.delete(`files/${file_id}`)
+
+			const file = await c.var.store.getFileById(file_id)
+			if (!file) {
+				// make sure it doesn't exist in R2 either
 				return c.notFound()
 			}
-			await c.env.R2.delete(`files/${file_id}`)
+
+			// Delete from DB
+			await c.var.store.deleteFileById(file_id)
 			return c.body(null, httpStatus.NoContent)
 		},
 	)

@@ -1,6 +1,7 @@
 import { SearchFileResponse, UploadFileResponse } from '$lib/api'
 import { env } from 'cloudflare:test'
 import { httpStatus } from 'http-codex/status'
+import { datePlus } from 'itty-time'
 import { assert, describe, expect } from 'vitest'
 
 import { testSuite } from './suite'
@@ -19,6 +20,46 @@ describe('PUT /api/file', async () => {
 		const dbFile = await h.store.getFileById(file_id)
 		assert(dbFile !== null)
 		expect(dbFile.file_id).toBe(file_id)
+	})
+
+	it('defaults to 1 day expiration', async ({ h }) => {
+		const minExpectedExpiresAfter = datePlus('86400 seconds').getTime()
+		const maxExpectedExpiresAfter = datePlus('86460 seconds').getTime()
+
+		const res = await h.client.uploadFile('hello.txt', 'world')
+		expect(res.status).toBe(httpStatus.OK)
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
+		expect(filename).toBe('hello.txt')
+		const keys = await env.R2.list()
+		expect(keys.objects.length).toBe(1)
+
+		const dbFile = await h.store.getFileById(file_id)
+		assert(dbFile !== null)
+		expect(dbFile.file_id).toBe(file_id)
+
+		const expiresOnSeconds = dbFile.expires_on.getTime()
+		expect(expiresOnSeconds).toBeGreaterThanOrEqual(minExpectedExpiresAfter)
+		expect(expiresOnSeconds).toBeLessThanOrEqual(maxExpectedExpiresAfter)
+	})
+
+	it('allows setting custom expiration', async ({ h }) => {
+		const minExpectedExpiresAfter = datePlus('7000 seconds').getTime()
+		const maxExpectedExpiresAfter = datePlus('7060 seconds').getTime()
+
+		const res = await h.client.uploadFile('hello.txt', 'world', 7000)
+		expect(res.status).toBe(httpStatus.OK)
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
+		expect(filename).toBe('hello.txt')
+		const keys = await env.R2.list()
+		expect(keys.objects.length).toBe(1)
+
+		const dbFile = await h.store.getFileById(file_id)
+		assert(dbFile !== null)
+		expect(dbFile.file_id).toBe(file_id)
+
+		const expiresOnSeconds = dbFile.expires_on.getTime()
+		expect(expiresOnSeconds).toBeGreaterThanOrEqual(minExpectedExpiresAfter)
+		expect(expiresOnSeconds).toBeLessThanOrEqual(maxExpectedExpiresAfter)
 	})
 })
 
@@ -87,7 +128,7 @@ describe('DELETE /api/file/:file_id', async () => {
 		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
 	})
 
-	it('deletes uploaded file', async ({ h }) => {
+	it('deletes uploaded file from R2 and DB', async ({ h }) => {
 		const res = await h.client.uploadFile('hello5.txt', 'world5')
 		expect(res.status).toBe(httpStatus.OK)
 		const { file_id, filename } = UploadFileResponse.parse(await res.json())
