@@ -77,18 +77,31 @@ export const router = new Hono<HonoApp>()
 				filename: z.string(),
 			}),
 		),
+		zValidator(
+			'query',
+			z.object({
+				expiration_ttl: z.coerce
+					.number()
+					.min(1)
+					.default(60 * 60 * 24)
+					.describe('number of seconds the file is valid for (defaults to 1 day)'),
+			}),
+		),
 		async (c) => {
 			const { filename } = c.req.valid('param')
+			const { expiration_ttl } = c.req.valid('query')
 			const file = await c.req.blob()
 			const { file_id } = await c.var.store.insertFile({
 				filename,
-				expires_on: datePlus('1 day'),
+				expires_on: new Date(Date.now() + expiration_ttl * 1000),
 			})
+
 			await c.env.R2.put(`files/${file_id}`, file, {
 				customMetadata: R2FileMetadata.parse({
 					filename,
 				} satisfies R2FileMetadata),
 			})
+
 			return c.json(
 				UploadFileResponse.parse({
 					file_id,

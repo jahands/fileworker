@@ -8,8 +8,12 @@ export class TestClient {
 	/**
 	 * PUT /api/file/:filename
 	 */
-	async uploadFile(filename: string, file: BodyInit): Promise<Response> {
-		return SELF.fetch(route(`/api/file/${filename}`), {
+	async uploadFile(filename: string, file: BodyInit, expiration_ttl?: number): Promise<Response> {
+		const url = new URL(route(`/api/file/${filename}`))
+		if (expiration_ttl) {
+			url.searchParams.set('expiration_ttl', expiration_ttl.toString())
+		}
+		return SELF.fetch(url.toString(), {
 			method: 'PUT',
 			body: file,
 		})
