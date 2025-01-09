@@ -5,6 +5,8 @@ import { z } from 'zod'
 
 import { TestClient } from './client'
 
+import type { InsertFileResult } from '$lib/db/store'
+
 export function testSuite(): TestSuite {
 	return new TestSuite()
 }
@@ -39,6 +41,29 @@ class TestHarness {
 	constructor(readonly suite: TestSuite) {
 		this.client = new TestClient()
 		this.store = new DBStore(env.DB)
+	}
+
+	/**
+	 * Adds random file entries to the DB.
+	 * Useful for testing queries that assert
+	 * we return filtered data correctly.
+	 */
+	async addRandomFiles(): Promise<InsertFileResult[]> {
+		const files = await Promise.all([
+			await this.store.insertFile({
+				filename: 'hello.txt',
+				expires_on: new Date(),
+			}),
+			await this.store.insertFile({
+				filename: 'hello2.txt',
+				expires_on: new Date(),
+			}),
+			await this.store.insertFile({
+				filename: 'hello3.txt',
+				expires_on: new Date(),
+			}),
+		])
+		return files
 	}
 }
 

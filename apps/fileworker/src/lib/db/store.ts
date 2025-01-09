@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, lte, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/d1'
 import { z } from 'zod'
 
@@ -59,5 +59,15 @@ export class DBStore {
 			return null
 		}
 		return DeleteFileResult.parse(rows[0])
+	}
+
+	async getFilesExpiringBefore(expires_before: Date, limit = 1000): Promise<FileSelect[]> {
+		const rows = await this.db
+			.select()
+			.from(files)
+			.where(sql`${files.expires_on} < ${expires_before.toISOString()}`)
+			.limit(limit)
+
+		return FileSelect.array().parse(rows)
 	}
 }
