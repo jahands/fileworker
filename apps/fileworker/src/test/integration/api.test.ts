@@ -1,4 +1,5 @@
 import { SearchFileResponse, UploadFileResponse } from '$lib/api'
+import { generateToken } from '$lib/crypto'
 import { env } from 'cloudflare:test'
 import { httpStatus } from 'http-codex/status'
 import { datePlus } from 'itty-time'
@@ -123,22 +124,32 @@ describe('GET /api/file/search/:file_id', async () => {
 
 describe('DELETE /api/file/:file_id', async () => {
 	it('returns 404 for invalid file', async ({ h }) => {
-		const res = await h.client.deleteFile('abcd')
+		const res = await h.client.deleteFile('abcd', await generateToken())
 		expect(res.status).toBe(404)
 		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
+	})
+
+	it('returns 403 for incorrect delete_token', async ({ h }) => {
+		const res = await h.client.uploadFile('hello6.txt', 'world6')
+		expect(res.status).toBe(httpStatus.OK)
+		const { file_id } = UploadFileResponse.parse(await res.json())
+
+		const res2 = await h.client.deleteFile(file_id, await generateToken())
+		expect(res2.status).toBe(httpStatus.Forbidden)
+		expect(await res2.text()).toMatchInlineSnapshot(`"Forbidden"`)
 	})
 
 	it('deletes uploaded file from R2 and DB', async ({ h }) => {
 		const res = await h.client.uploadFile('hello5.txt', 'world5')
 		expect(res.status).toBe(httpStatus.OK)
-		const { file_id, filename } = UploadFileResponse.parse(await res.json())
+		const { file_id, filename, delete_token } = UploadFileResponse.parse(await res.json())
 
 		// download it
 		const res2 = await h.client.downloadFile(file_id, filename)
 		expect(await res2.text()).toBe('world5')
 
 		// delete it
-		await h.client.deleteFile(file_id)
+		await h.client.deleteFile(file_id, delete_token)
 
 		// try to download it -> 404
 		const res3 = await h.client.downloadFile(file_id, filename)
@@ -148,7 +159,3 @@ describe('DELETE /api/file/:file_id', async () => {
 		expect((await env.R2.list()).objects.length).toBe(0)
 	})
 })
-
-function getFileIdFromDownloadUrl(url: string): string {
-	return url.split('/')[3]
-}

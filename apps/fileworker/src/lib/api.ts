@@ -1,21 +1,15 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { httpStatus } from 'http-codex/status'
-import { datePlus } from 'itty-time'
 import { z } from 'zod'
 
 import { errorMissingPlatform } from '../routes/util'
+import { generateToken, hashToken, verifyToken } from './crypto'
 import { DBStore } from './db/store'
 
 import type { RequestHandler } from '@sveltejs/kit'
 import type { Context } from 'hono'
 import type { HonoApp } from '../app'
-
-export type GetFileParams = z.infer<typeof GetFileParams>
-export const GetFileParams = z.object({
-	file_id: z.string(),
-	filename: z.string(),
-})
 
 export type SearchFileResponse = z.infer<typeof SearchFileResponse>
 export const SearchFileResponse = z.object({
@@ -26,6 +20,7 @@ export type UploadFileResponse = z.infer<typeof UploadFileResponse>
 export const UploadFileResponse = z.object({
 	file_id: z.string().min(1),
 	filename: z.string().min(1),
+	delete_token: z.string().length(24),
 	expires_on: z.coerce.date(),
 })
 
@@ -94,9 +89,11 @@ export const router = new Hono<HonoApp>()
 			const file = await c.req.blob()
 
 			const expires_on = new Date(Date.now() + expiration_ttl * 1000)
+			const delete_token = await generateToken(24)
 			const { file_id } = await c.var.store.insertFile({
 				filename,
 				expires_on,
+				delete_token_hash: await hashToken(delete_token),
 			})
 
 			await c.env.R2.put(`files/${file_id}`, file, {
@@ -109,6 +106,7 @@ export const router = new Hono<HonoApp>()
 				UploadFileResponse.parse({
 					file_id,
 					filename,
+					delete_token,
 					expires_on,
 				} satisfies UploadFileResponse),
 			)
@@ -153,18 +151,29 @@ export const router = new Hono<HonoApp>()
 				file_id: z.string(),
 			}),
 		),
+		zValidator(
+			'query',
+			z.object({
+				delete_token: z.string().min(1),
+			}),
+		),
 		async (c) => {
 			const { file_id } = c.req.valid('param')
-
-			// Always ensure it's deleted from R2, even if it doesn't
-			// exist in DB (just in case we got in a bad state).
-			await c.env.R2.delete(`files/${file_id}`)
+			const { delete_token } = c.req.valid('query')
 
 			const file = await c.var.store.getFileById(file_id)
 			if (!file) {
 				// make sure it doesn't exist in R2 either
 				return c.notFound()
 			}
+			const tokenValid = await verifyToken(file.delete_token_hash, delete_token)
+			if (!tokenValid) {
+				return c.text('Forbidden', 403)
+			}
+
+			// Always ensure it's deleted from R2, even if it doesn't
+			// exist in DB (just in case we got in a bad state).
+			await c.env.R2.delete(`files/${file_id}`)
 
 			// Delete from DB
 			await c.var.store.deleteFileById(file_id)

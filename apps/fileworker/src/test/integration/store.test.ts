@@ -1,7 +1,4 @@
-import { DBStore } from '$lib/db/store'
-import { env } from 'cloudflare:test'
-import { httpStatus } from 'http-codex/status'
-import { datePlus } from 'itty-time'
+import { generateToken, hashToken, verifyToken } from '$lib/crypto'
 import { assert, describe, expect } from 'vitest'
 
 import { testSuite } from './suite'
@@ -14,6 +11,7 @@ describe('insertFile()', () => {
 		const { file_id } = await h.store.insertFile({
 			filename: 'hello.txt',
 			expires_on: new Date(),
+			delete_token_hash: await hashToken(await generateToken()),
 		})
 
 		expect(file_id.length).toBe(9)
@@ -30,9 +28,11 @@ describe('getFileById()', () => {
 	it('returns file associated with the file_id', async ({ h }) => {
 		await h.addRandomFiles()
 		const expires_on = new Date()
+		const delete_token = await generateToken()
 		const { file_id } = await h.store.insertFile({
 			filename: 'hello.txt',
 			expires_on,
+			delete_token_hash: await hashToken(delete_token),
 		})
 
 		const file = await h.store.getFileById(file_id)
@@ -41,6 +41,7 @@ describe('getFileById()', () => {
 		expect(file.name).toBe('hello.txt')
 		expect(file.expires_on.getTime()).toBe(expires_on.getTime())
 		expect(file.file_pk).toBeGreaterThan(0)
+		expect(await verifyToken(file.delete_token_hash, delete_token)).toBe(true)
 	})
 })
 
@@ -51,14 +52,17 @@ describe('getFilesExpiringBefore()', () => {
 			h.store.insertFile({
 				filename: 'hello1.txt',
 				expires_on: new Date('2022-01-03'),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 			h.store.insertFile({
 				filename: 'hello2.txt',
 				expires_on: new Date('2023-01-03'),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 			h.store.insertFile({
 				filename: 'hello3.txt',
 				expires_on: new Date('2024-01-03'),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 		])
 
@@ -77,6 +81,7 @@ describe('deleteFileById()', () => {
 		const { file_id } = await h.store.insertFile({
 			filename: 'hello.txt',
 			expires_on: new Date(),
+			delete_token_hash: await hashToken(await generateToken()),
 		})
 
 		// make sure we can get it

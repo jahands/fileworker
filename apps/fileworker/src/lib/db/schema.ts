@@ -14,6 +14,7 @@ export const files = sqliteTable('files', {
 		.notNull()
 		.$defaultFn(() => new Date().toISOString()),
 	expires_on: text().notNull(),
+	delete_token_hash: text().notNull(),
 })
 
 // Zod schemas for the table. Docs: https://orm.drizzle.team/docs/zod

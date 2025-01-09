@@ -1,3 +1,4 @@
+import { generateToken, hashToken } from '$lib/crypto'
 import { DBStore } from '$lib/db/store'
 import { env } from 'cloudflare:test'
 import { test } from 'vitest'
@@ -53,14 +54,17 @@ class TestHarness {
 			await this.store.insertFile({
 				filename: 'hello.txt',
 				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 			await this.store.insertFile({
 				filename: 'hello2.txt',
 				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 			await this.store.insertFile({
 				filename: 'hello3.txt',
 				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
 			}),
 		])
 		return files

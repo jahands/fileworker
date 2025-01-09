@@ -46,9 +46,11 @@ export class TestClient {
 	/**
 	 * DELETE /api/file/:file_id/:filename
 	 */
-	async deleteFile(fileId: string): Promise<Response> {
-		let url = route(`/api/file/${fileId}`)
-		return SELF.fetch(url, {
+	async deleteFile(fileId: string, delete_token: string): Promise<Response> {
+		let url = new URL(route(`/api/file/${fileId}`))
+		url.searchParams.set('delete_token', delete_token)
+
+		return SELF.fetch(url.toString(), {
 			method: 'DELETE',
 		})
 	}
