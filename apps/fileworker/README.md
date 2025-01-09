@@ -1,17 +1,25 @@
-# sv
+# fileworker
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## Database
 
-## Creating a project
+This project requires a D1 database.
 
-If you're seeing this, you've probably already done this step. Congrats!
+Create a DB with:
 
 ```bash
-# create a new project in the current directory
-npx sv create
+npx wrangler d1 create fileworker
+```
 
-# create a new project in my-app
-npx sv create my-app
+Create new migration (after modifying `src/lib/db/schema.ts`):
+
+```bash
+npm run db:migrations:generate
+```
+
+Run migrations:
+
+```bash
+npm run db:migrations:apply
 ```
 
 ## Developing

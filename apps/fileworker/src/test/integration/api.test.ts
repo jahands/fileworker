@@ -1,19 +1,24 @@
-import { SearchFileResponse } from '$lib/api'
+import { SearchFileResponse, UploadFileResponse } from '$lib/api'
 import { env } from 'cloudflare:test'
 import { httpStatus } from 'http-codex/status'
-import { assert, describe, expect, test } from 'vitest'
+import { assert, describe, expect } from 'vitest'
 
 import { testSuite } from './suite'
 
 const { it } = testSuite()
 
 describe('PUT /api/file', async () => {
-	it('uploads the file to R2', async ({ h }) => {
+	it('uploads the file to R2 and writes to DB', async ({ h }) => {
 		const res = await h.client.uploadFile('hello.txt', 'world')
 		expect(res.status).toBe(httpStatus.OK)
-		assert((await res.text()).endsWith('/hello.txt'))
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
+		expect(filename).toBe('hello.txt')
 		const keys = await env.R2.list()
 		expect(keys.objects.length).toBe(1)
+
+		const dbFile = await h.store.getFileById(file_id)
+		assert(dbFile !== null)
+		expect(dbFile.file_id).toBe(file_id)
 	})
 })
 
@@ -27,10 +32,11 @@ describe('GET /:file_id/:filename', async () => {
 	it('downloads uploaded file', async ({ h }) => {
 		const res = await h.client.uploadFile('hello2.txt', 'world2')
 		expect(res.status).toBe(httpStatus.OK)
-		const downloadUrl = await res.text()
+
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
 
 		// download it
-		const res2 = await h.client.fetch(downloadUrl)
+		const res2 = await h.client.downloadFile(file_id, filename)
 		expect(await res2.text()).toBe('world2')
 	})
 })
@@ -45,10 +51,10 @@ describe('GET /api/file/:file_id/:filename', async () => {
 	it('downloads uploaded file', async ({ h }) => {
 		const res = await h.client.uploadFile('hello3.txt', 'world3')
 		expect(res.status).toBe(httpStatus.OK)
-		const downloadUrl = await res.text()
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
 
 		// download it
-		const res2 = await h.client.fetch(downloadUrl)
+		const res2 = await h.client.downloadFile(file_id, filename)
 		expect(await res2.text()).toBe('world3')
 	})
 })
@@ -63,13 +69,10 @@ describe('GET /api/file/search/:file_id', async () => {
 	it('returns filename for existing file', async ({ h }) => {
 		const res = await h.client.uploadFile('hello4.txt', 'world4')
 		expect(res.status).toBe(httpStatus.OK)
-		const downloadUrl = await res.text()
-
-		const fileId = getIdFromDownloadUrl(downloadUrl)
-		assert(fileId.length > 0)
+		const { file_id } = UploadFileResponse.parse(await res.json())
 
 		// search for the file
-		const res2 = await h.client.searchFile(fileId)
+		const res2 = await h.client.searchFile(file_id)
 		expect(res2.status).toBe(httpStatus.OK)
 		const body = await res2.json()
 		const { filename } = SearchFileResponse.parse(body)
@@ -87,17 +90,17 @@ describe('DELETE /api/file/:file_id', async () => {
 	it('deletes uploaded file', async ({ h }) => {
 		const res = await h.client.uploadFile('hello5.txt', 'world5')
 		expect(res.status).toBe(httpStatus.OK)
-		const downloadUrl = await res.text()
+		const { file_id, filename } = UploadFileResponse.parse(await res.json())
 
 		// download it
-		const res2 = await h.client.fetch(downloadUrl)
+		const res2 = await h.client.downloadFile(file_id, filename)
 		expect(await res2.text()).toBe('world5')
 
 		// delete it
-		await h.client.deleteFile(getIdFromDownloadUrl(downloadUrl))
+		await h.client.deleteFile(file_id)
 
 		// try to download it -> 404
-		const res3 = await h.client.fetch(downloadUrl)
+		const res3 = await h.client.downloadFile(file_id, filename)
 		expect(res3.status).toBe(httpStatus.NotFound)
 
 		// should no longer be in R2
@@ -105,6 +108,6 @@ describe('DELETE /api/file/:file_id', async () => {
 	})
 })
 
-function getIdFromDownloadUrl(url: string): string {
+function getFileIdFromDownloadUrl(url: string): string {
 	return url.split('/')[3]
 }
