@@ -20,12 +20,6 @@
 
 	const url = $derived.by(() => {
 		let url = new URL(page.url)
-		url.pathname = `/api/file/${file_id}/${filename}`
-		return url
-	})
-
-	const urlAlt = $derived.by(() => {
-		let url = new URL(page.url)
 		url.pathname = `/${file_id}/${filename}`
 		return url
 	})
@@ -52,17 +46,9 @@
 				<TableBodyRow>
 					<TableBodyCell>Download URL</TableBodyCell>
 					<TableBodyCell>
-						<a class="font-medium text-primary-600 hover:underline" href={url.toString()}
-							>Download</a
-						>
-					</TableBodyCell>
-				</TableBodyRow>
-				<TableBodyRow>
-					<TableBodyCell>Download URL (alt)</TableBodyCell>
-					<TableBodyCell>
-						<a class="font-medium text-primary-600 hover:underline" href={urlAlt.toString()}
-							>Download</a
-						>
+						<a class="font-medium text-primary-600 hover:underline" href={url.toString()}>
+							Download
+						</a>
 					</TableBodyCell>
 				</TableBodyRow>
 			{/if}
@@ -70,7 +56,7 @@
 				<TableBodyRow>
 					<TableBodyCell>cURL command</TableBodyCell>
 					<TableBodyCell>
-						<code>curl --remote-name '{urlAlt.toString()}'</code>
+						<code>curl --remote-name '{url.toString()}'</code>
 					</TableBodyCell>
 				</TableBodyRow>
 			{/if}
