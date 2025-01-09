@@ -128,7 +128,7 @@ describe('DELETE /api/file/:file_id', async () => {
 		expect(await res.text()).toMatchInlineSnapshot(`"404 Not Found"`)
 	})
 
-	it('deletes uploaded file', async ({ h }) => {
+	it('deletes uploaded file from R2 and DB', async ({ h }) => {
 		const res = await h.client.uploadFile('hello5.txt', 'world5')
 		expect(res.status).toBe(httpStatus.OK)
 		const { file_id, filename } = UploadFileResponse.parse(await res.json())

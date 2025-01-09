@@ -9,6 +9,12 @@ export type InsertFileResult = z.infer<typeof InsertFileResult>
 export const InsertFileResult = z.object({
 	file_id: z.string().length(9),
 })
+
+export type DeleteFileResult = z.infer<typeof DeleteFileResult>
+export const DeleteFileResult = z.object({
+	file_id: z.string().length(9),
+})
+
 export class DBStore {
 	private readonly db
 
@@ -43,5 +49,15 @@ export class DBStore {
 			return null
 		}
 		return FileSelect.parse(rows[0])
+	}
+
+	async deleteFileById(file_id: string): Promise<DeleteFileResult | null> {
+		const rows = await this.db.delete(files).where(eq(files.file_id, file_id)).returning({
+			file_id: files.file_id,
+		})
+		if (rows.length === 0) {
+			return null
+		}
+		return DeleteFileResult.parse(rows[0])
 	}
 }

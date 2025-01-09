@@ -151,11 +151,19 @@ export const router = new Hono<HonoApp>()
 		),
 		async (c) => {
 			const { file_id } = c.req.valid('param')
-			const meta = await c.env.R2.head(`files/${file_id}`)
-			if (!meta) {
+
+			// Always ensure it's deleted from R2, even if it doesn't
+			// exist in DB (just in case we got in a bad state).
+			await c.env.R2.delete(`files/${file_id}`)
+
+			const file = await c.var.store.getFileById(file_id)
+			if (!file) {
+				// make sure it doesn't exist in R2 either
 				return c.notFound()
 			}
-			await c.env.R2.delete(`files/${file_id}`)
+
+			// Delete from DB
+			await c.var.store.deleteFileById(file_id)
 			return c.body(null, httpStatus.NoContent)
 		},
 	)
