@@ -1,5 +1,8 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+
+import { DBStore } from '$lib/db/store'
+
 declare global {
 	namespace App {
 		interface Platform {
@@ -12,11 +15,17 @@ declare global {
 
 export type Env = {
 	R2: R2Bucket
+	DB: D1Database
+
+	/** Only used in tests */
+	TEST_MIGRATIONS: D1Migration[]
 }
 
 export type HonoApp = {
 	Bindings: Env
-	Variables: undefined
+	Variables: {
+		store: DBStore
+	}
 }
 
 export {}

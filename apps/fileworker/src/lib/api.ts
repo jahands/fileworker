@@ -1,9 +1,11 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { httpStatus } from 'http-codex/status'
+import { datePlus } from 'itty-time'
 import { z } from 'zod'
 
 import { errorMissingPlatform } from '../routes/util'
+import { DBStore } from './db/store'
 
 import type { RequestHandler } from '@sveltejs/kit'
 import type { Context } from 'hono'
@@ -17,6 +19,12 @@ export const GetFileParams = z.object({
 
 export type SearchFileResponse = z.infer<typeof SearchFileResponse>
 export const SearchFileResponse = z.object({
+	filename: z.string().min(1),
+})
+
+export type UploadFileResponse = z.infer<typeof UploadFileResponse>
+export const UploadFileResponse = z.object({
+	file_id: z.string().min(1),
 	filename: z.string().min(1),
 })
 
@@ -35,9 +43,15 @@ export const routeHandler: RequestHandler = ({ request, platform }) => {
 
 export type Router = typeof router
 export const router = new Hono<HonoApp>()
+	.use(async (c, next) => {
+		const store = new DBStore(c.env.DB)
+		c.set('store', store)
+
+		await next()
+	})
 
 	.get(
-		'/api/file/search/:file_id?',
+		'/api/file/search/:file_id',
 		zValidator(
 			'param',
 			z.object({
@@ -66,14 +80,21 @@ export const router = new Hono<HonoApp>()
 		async (c) => {
 			const { filename } = c.req.valid('param')
 			const file = await c.req.blob()
-			// todo: use a shorter ID and record to DB
-			const id = crypto.randomUUID()
-			await c.env.R2.put(`files/${id}`, file, {
+			const { file_id } = await c.var.store.insertFile({
+				filename,
+				expires_on: datePlus('1 day'),
+			})
+			await c.env.R2.put(`files/${file_id}`, file, {
 				customMetadata: R2FileMetadata.parse({
 					filename,
 				} satisfies R2FileMetadata),
 			})
-			return c.json({ file_id: id, filename: filename })
+			return c.json(
+				UploadFileResponse.parse({
+					file_id,
+					filename,
+				} satisfies UploadFileResponse),
+			)
 		},
 	)
 

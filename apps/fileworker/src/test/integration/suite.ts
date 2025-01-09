@@ -1,3 +1,4 @@
+import { DBStore } from '$lib/db/store'
 import { env } from 'cloudflare:test'
 import { test } from 'vitest'
 import { z } from 'zod'
@@ -33,9 +34,11 @@ class TestSuite {
 
 class TestHarness {
 	readonly client: TestClient
+	readonly store: DBStore
 
 	constructor(readonly suite: TestSuite) {
 		this.client = new TestClient()
+		this.store = new DBStore(env.DB)
 	}
 }
 
