@@ -18,6 +18,11 @@
 		"head_sampling_rate": 1
 	},
 
+	"triggers": {
+		// Hourly Cron trigger to clean up expired files
+		"crons": ["38 * * * *"]
+	},
+
 	"r2_buckets": [
 		{
 			"binding": "R2",

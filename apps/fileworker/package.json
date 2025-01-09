@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "tsx ./scripts/build.ts",
     "preview": "npm run build && wrangler dev",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -15,7 +15,8 @@
     "test:svelte": "vitest -c ./vitest.config.svelte.ts",
     "deploy": "npm run build && wrangler deploy",
     "db:migrations:generate": "drizzle-kit generate",
-    "db:migrations:apply": "wrangler d1 migrations apply DB",
+    "db:migrations:apply:local": "wrangler d1 migrations apply DB --local",
+    "db:migrations:apply:remote": "wrangler d1 migrations apply DB --remote",
     "cf-typegen": "wrangler types && mv worker-configuration.d.ts src/"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "autoprefixer": "^10.4.20",
     "drizzle-kit": "^0.30.1",
+    "esbuild": "0.24.2",
     "eslint": "^9.7.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.36.0",
@@ -39,11 +41,13 @@
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "tailwindcss": "^3.4.9",
+    "tsx": "4.19.2",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.0.0",
     "vite": "^5.4.10",
     "vitest": "^2.0.4",
-    "wrangler": "^3.99.0"
+    "wrangler": "^3.99.0",
+    "zx": "8.2.4"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.4.2",
