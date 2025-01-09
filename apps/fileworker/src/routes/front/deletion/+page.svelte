@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
-	import { Button, Heading, Input, Label, P, Spinner } from 'flowbite-svelte'
+	import { GradientButton, Heading, Input, Label, P, Spinner } from 'flowbite-svelte'
 
 	let alertFeed: AlertFeed
 
@@ -12,7 +12,7 @@
 	async function submit() {
 		submitting = true
 		try {
-			const resp = await fetch(`/api/file/${file_id}`, {
+			const resp = await fetch(`/api/file/${file_id}?delete_token=${fileDeletionToken}`, {
 				method: 'DELETE',
 				body: JSON.stringify({
 					deletionToken: fileDeletionToken,
@@ -74,13 +74,13 @@
 			</div>
 		</div>
 		<div class="text-center">
-			<Button type="submit" disabled={submitting}>
+			<GradientButton type="submit" color="red" disabled={submitting}>
 				{#if submitting}
 					<Spinner class="me-4" color="white" size="4" />Deleting...
 				{:else}
 					Delete
 				{/if}
-			</Button>
+			</GradientButton>
 		</div>
 	</form>
 	<AlertFeed bind:this={alertFeed} />

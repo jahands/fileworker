@@ -1,17 +1,17 @@
 <script lang="ts">
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
-	import FileInfoCard from '$lib/components/FileInfoCard.svelte'
 	import { Dropzone, Fileupload, Heading, Helper, Label, P, Spinner } from 'flowbite-svelte'
 	import UploadInfoCard from '$lib/components/UploadInfoCard.svelte';
+	import type { UploadFileResponse } from '$lib/api'
 
 	let alertFeed: AlertFeed
 
 	let files = $state<FileList>()
 	let candidateFile = $derived(files?.item(0) || null)
-	let filename = $state('')
-	let file_id = $state('')
 	let submitting = $state(false)
+	
+	let uploadedFiles = $state<UploadFileResponse[]>([])
 
 	function onDropzoneDrop(event: DragEvent) {
 		event.preventDefault()
@@ -48,13 +48,13 @@
 			})
 			switch (resp.status) {
 				case 200:
-					const json: { file_id: string; filename: string } = await resp.json()
+					const json: UploadFileResponse = await resp.json()
 					if (!json.file_id) {
 						alertFeed.showAlert(`File upload unable to parse response.`, { type: 'error' })
 						return
 					}
-					file_id = json.file_id
-					filename = json.filename
+					uploadedFiles.push(json)
+					
 					alertFeed.showAlert(`File upload successful.`, { type: 'success' })
 					break
 				default:
@@ -64,6 +64,13 @@
 		} finally {
 			submitting = false
 		}
+	}
+
+	function onDelete(file_id: string) {
+		uploadedFiles = uploadedFiles.filter(f => f.file_id !== file_id) 
+		alertFeed.showAlert(`File deletion successful.`, {
+			type: 'success',
+		})
 	}
 </script>
 
@@ -122,9 +129,14 @@
 		<AlertFeed bind:this={alertFeed} />
 	</div>
 
-	{#if file_id !== ''}
+	{#each uploadedFiles as uploadedFile}
 		<div class="mb-4">
-			<UploadInfoCard class="mx-auto" showDownload={true} {file_id} {filename} deletionToken="test" />
+			<UploadInfoCard class="mx-auto" 
+				file_id={uploadedFile.file_id}  
+				filename={uploadedFile.filename}
+				deletionToken={uploadedFile.delete_token} 
+				onDelete={onDelete} 
+			/>
 		</div>
-	{/if}
+	{/each}
 </Body>
