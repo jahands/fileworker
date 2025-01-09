@@ -30,6 +30,7 @@ const config = {
 	semi: false,
 	singleQuote: true,
 	printWidth: 100,
+	htmlWhitespaceSensitivity: 'ignore',
 	plugins: [
 		'@ianvs/prettier-plugin-sort-imports',
 		'prettier-plugin-multiline-arrays',

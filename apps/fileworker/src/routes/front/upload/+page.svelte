@@ -2,32 +2,49 @@
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
 	import FileInfoCard from '$lib/components/FileInfoCard.svelte'
-	import { Button, Card, Fileupload, Heading, Helper, Label, P } from 'flowbite-svelte'
+	import { Dropzone, Fileupload, Heading, Helper, Label, P, Spinner } from 'flowbite-svelte'
 
 	let alertFeed: AlertFeed
 
 	let files = $state<FileList>()
+	let candidateFile = $derived(files?.item(0) || null)
 	let filename = $state('')
 	let file_id = $state('')
+	let submitting = $state(false)
+
+	function onDropzoneDrop(event: DragEvent) {
+		event.preventDefault()
+		const eventFiles = event.dataTransfer?.files
+		if (eventFiles) {
+			files = eventFiles
+		}
+	}
+
+	function onDropzoneChange(event: Event) {
+		event.preventDefault()
+		const eventFiles = (event.target as HTMLInputElement)?.files
+		if (eventFiles) {
+			files = eventFiles
+		}
+	}
+
+	function onDropzoneDragover(event: Event) {
+		event?.preventDefault()
+	}
 
 	$effect(() => {
-		if (files) {
-			submit()
+		if (candidateFile) {
+			submitFile(candidateFile)
 		}
 	})
 
-	async function submit() {
+	async function submitFile(file: File) {
+		submitting = true
 		try {
-			const file = files?.item(0)
-			if (!file) {
-				return
-			}
-
 			const resp = await fetch(`/api/file/${file.name}`, {
 				method: 'PUT',
 				body: file,
 			})
-
 			switch (resp.status) {
 				case 200:
 					const json: { file_id: string; filename: string } = await resp.json()
@@ -37,7 +54,6 @@
 					}
 					file_id = json.file_id
 					filename = json.filename
-
 					alertFeed.showAlert(`File upload successful.`, { type: 'success' })
 					break
 				default:
@@ -45,6 +61,7 @@
 					break
 			}
 		} finally {
+			submitting = false
 		}
 	}
 </script>
@@ -56,9 +73,49 @@
 <Body>
 	<Heading tag="h2" class="mb-4">Upload page</Heading>
 	<P class="mb-4">Easy file sharing from the command line</P>
-	<Label for="with_helper" class="pb-2">Upload file</Label>
-	<Fileupload id="with_helper" name="file_drop" bind:files class="mb-2" />
-	<Helper>Click here or drag a file</Helper>
+	<form class="mb-4">
+		<Label for="with_helper" class="mb-2">
+			Upload file
+			{#if submitting}
+				<Spinner class="me-4" size="4" />
+			{/if}
+		</Label>
+		<Fileupload id="with_helper" name="file_drop" bind:files class="mb-2" />
+		<Dropzone
+			id="dropzone"
+			on:drop={onDropzoneDrop}
+			on:change={onDropzoneChange}
+			on:dragover={onDropzoneDragover}
+		>
+			<svg
+				aria-hidden="true"
+				class="mb-3 w-10 h-10 text-gray-400"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+				/>
+			</svg>
+			{#if !candidateFile}
+				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+					<span class="font-semibold">Click to upload</span>
+					 or drag and drop.
+				</p>
+			{:else}
+				<p class="mb-2">{candidateFile.name}</p>
+				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+					<span class="font-semibold">Click to upload another file</span>
+					 or drag and drop.
+				</p>
+			{/if}
+		</Dropzone>
+	</form>
 
 	<div class="mb-4">
 		<AlertFeed bind:this={alertFeed} />
