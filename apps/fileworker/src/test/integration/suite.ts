@@ -1,9 +1,12 @@
+import { generateToken, hashToken } from '$lib/crypto'
 import { DBStore } from '$lib/db/store'
 import { env } from 'cloudflare:test'
 import { test } from 'vitest'
 import { z } from 'zod'
 
 import { TestClient } from './client'
+
+import type { InsertFileResult } from '$lib/db/store'
 
 export function testSuite(): TestSuite {
 	return new TestSuite()
@@ -39,6 +42,32 @@ class TestHarness {
 	constructor(readonly suite: TestSuite) {
 		this.client = new TestClient()
 		this.store = new DBStore(env.DB)
+	}
+
+	/**
+	 * Adds random file entries to the DB.
+	 * Useful for testing queries that assert
+	 * we return filtered data correctly.
+	 */
+	async addRandomFiles(): Promise<InsertFileResult[]> {
+		const files = await Promise.all([
+			await this.store.insertFile({
+				filename: 'hello.txt',
+				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
+			}),
+			await this.store.insertFile({
+				filename: 'hello2.txt',
+				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
+			}),
+			await this.store.insertFile({
+				filename: 'hello3.txt',
+				expires_on: new Date(),
+				delete_token_hash: await hashToken(await generateToken()),
+			}),
+		])
+		return files
 	}
 }
 

@@ -1,4 +1,5 @@
-import { eq } from 'drizzle-orm'
+import { generateToken } from '$lib/crypto'
+import { eq, lte, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/d1'
 import { z } from 'zod'
 
@@ -25,15 +26,18 @@ export class DBStore {
 	async insertFile({
 		filename,
 		expires_on,
+		delete_token_hash,
 	}: {
 		filename: string
 		expires_on: Date
+		delete_token_hash: string
 	}): Promise<InsertFileResult> {
 		const rows = await this.db
 			.insert(files)
 			.values({
 				name: filename,
 				expires_on: expires_on.toISOString(),
+				delete_token_hash: delete_token_hash,
 			})
 			.returning({ file_id: files.file_id })
 
@@ -59,5 +63,15 @@ export class DBStore {
 			return null
 		}
 		return DeleteFileResult.parse(rows[0])
+	}
+
+	async getFilesExpiringBefore(expires_before: Date, limit = 1000): Promise<FileSelect[]> {
+		const rows = await this.db
+			.select()
+			.from(files)
+			.where(sql`${files.expires_on} < ${expires_before.toISOString()}`)
+			.limit(limit)
+
+		return FileSelect.array().parse(rows)
 	}
 }
