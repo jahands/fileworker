@@ -8,7 +8,17 @@
 	let alertFeed: AlertFeed
 
 	let files = $state<FileList>()
-	let candidateFile = $derived(files?.item(0) || null)
+	let candidateFiles = $derived.by(() => {
+		const length = files?.length
+		const candidateFiles: File[]  = []
+		for (var i = 0; i < (length || 0); i++) {
+			const file = files?.item(0)
+			if (file) {
+				candidateFiles.push(file)
+			}
+		}
+		return candidateFiles
+	})
 	let submitting = $state(false)
 	
 	let uploadedFiles = $state<UploadFileResponse[]>([])
@@ -34,8 +44,10 @@
 	}
 
 	$effect(() => {
-		if (candidateFile) {
-			submitFile(candidateFile)
+		if (candidateFiles.length > 0) {
+			candidateFiles.forEach(f => {
+				submitFile(f)
+			})
 		}
 	})
 
@@ -110,13 +122,15 @@
 					d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
 				/>
 			</svg>
-			{#if !candidateFile}
+			{#if candidateFiles.length === 0}
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload</span>
 					 or drag and drop.
 				</p>
 			{:else}
-				<p class="mb-2">{candidateFile.name}</p>
+				{#each candidateFiles as candidateFile}
+					<p class="mb-2">{candidateFile.name}</p>
+				{/each}
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload another file</span>
 					 or drag and drop.
