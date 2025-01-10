@@ -13,7 +13,7 @@
     "lint": "prettier --check . && eslint .",
     "test": "vitest -c ./vitest.config.ts",
     "test:svelte": "vitest -c ./vitest.config.svelte.ts",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "tsx ./scripts/deploy.ts --env production",
     "db:migrations:generate": "drizzle-kit generate",
     "db:migrations:apply:local": "wrangler d1 migrations apply DB --local",
     "db:migrations:apply:remote": "wrangler d1 migrations apply DB --remote",
@@ -22,12 +22,14 @@
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "0.5.40",
     "@cloudflare/workers-types": "^4.20241230.0",
+    "@commander-js/extra-typings": "12.1.0",
     "@eslint/compat": "^1.2.3",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-cloudflare": "^5.0.0",
     "@sveltejs/kit": "^2.9.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "autoprefixer": "^10.4.20",
+    "commander": "12.1.0",
     "drizzle-kit": "^0.30.1",
     "esbuild": "0.24.2",
     "eslint": "^9.7.0",
@@ -62,6 +64,8 @@
     "itty-time": "1.0.6",
     "nanoid": "^5.0.9",
     "tailwind-merge": "^2.6.0",
+    "toucan-js": "3.3.1",
+    "workers-tagged-logger": "0.3.8",
     "zod": "^3.24.1"
   }
 }

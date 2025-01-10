@@ -23,6 +23,9 @@
 		"crons": ["38 * * * *"]
 	},
 
+	"vars": {
+		// "SENTRY_DSN": "" // Set DSN to send errors to Sentry
+	},
 	"r2_buckets": [
 		{
 			"binding": "R2",

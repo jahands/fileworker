@@ -1,15 +1,18 @@
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { httpStatus } from 'http-codex/status'
+import { useWorkersLogger } from 'workers-tagged-logger'
 import { z } from 'zod'
 
 import { errorMissingPlatform } from '../routes/util'
 import { generateToken, hashToken, verifyToken } from './crypto'
 import { DBStore } from './db/store'
+import { useSentry } from './middleware'
 
 import type { RequestHandler } from '@sveltejs/kit'
 import type { Context } from 'hono'
 import type { HonoApp } from '../app'
+import type { LoggerTags } from './logger'
 
 export type SearchFileResponse = z.infer<typeof SearchFileResponse>
 export const SearchFileResponse = z.object({
@@ -39,6 +42,14 @@ export const routeHandler: RequestHandler = ({ request, platform }) => {
 
 export type Router = typeof router
 export const router = new Hono<HonoApp>()
+	// Observability
+	.use(useSentry)
+	.use(async (c, next) => {
+		await useWorkersLogger<LoggerTags>('fileworker', {
+			release: c.env.SENTRY_RELEASE,
+		})(c, next)
+	})
+
 	.use(async (c, next) => {
 		const store = new DBStore(c.env.DB)
 		c.set('store', store)
