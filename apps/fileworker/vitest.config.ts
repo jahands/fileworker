@@ -13,6 +13,7 @@ export default defineWorkersConfig(async () => {
 			setupFiles: ['./src/test/integration/apply-migrations.ts'],
 			alias: {
 				'$lib/api': `${__dirname}/src/lib/api.ts`,
+				'$lib/cron': `${__dirname}/src/lib/cron.ts`,
 				'$lib/crypto': `${__dirname}/src/lib/crypto.ts`,
 				'$lib/db/store': `${__dirname}/src/lib/db/store.ts`,
 			},

@@ -1,5 +1,4 @@
-import { generateToken } from '$lib/crypto'
-import { eq, lte, sql } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/d1'
 import { z } from 'zod'
 

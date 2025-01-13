@@ -9,7 +9,8 @@ const baseDir = path.resolve(path.basename(fileURLToPath(import.meta.url)), '..'
 await $({
 	env: process.env,
 	stdio: 'inherit',
-})`vite build`.verbose()
+	verbose: true,
+})`vite build`
 
 // Move the _worker.js file built by Vite so that
 // it can be imported by `src/lib/worker.ts`
@@ -28,4 +29,5 @@ await esbuild.build({
 	format: 'esm',
 	bundle: true,
 	treeShaking: true,
+	external: ['node:events', 'node:async_hooks', 'node:buffer'],
 })
