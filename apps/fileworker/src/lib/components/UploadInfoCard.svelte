@@ -18,7 +18,7 @@
 	} = $props()
 
 	let submitting = $state(false)
-	let alertFeed: AlertFeed
+	let alertFeed: AlertFeed | null = $state(null)
 
 	const url = $derived.by(() => {
 		let url = new URL(page.url)
@@ -49,10 +49,10 @@
 					onDelete(file_id)
 					break
 				case 404:
-					alertFeed.showAlert(`File not found.`, { type: 'warning' })
+					alertFeed?.showAlert(`File not found.`, { type: 'warning' })
 					break
 				default:
-					alertFeed.showAlert(`File deletion error.`, { type: 'error' })
+					alertFeed?.showAlert(`File deletion error.`, { type: 'error' })
 					break
 			}
 		} finally {
