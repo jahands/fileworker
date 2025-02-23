@@ -13,7 +13,7 @@
     "lint": "prettier --check . --ignore-unknown && eslint .",
     "test": "vitest -c ./vitest.config.ts",
     "test:svelte": "vitest -c ./vitest.config.svelte.ts",
-    "deploy": "tsx ./scripts/deploy.ts --env production",
+    "deploy": "tsx ./scripts/deploy.ts",
     "db:migrations:generate": "drizzle-kit generate",
     "db:migrations:apply:local": "wrangler d1 migrations apply DB --local",
     "db:migrations:apply:remote": "wrangler d1 migrations apply DB --remote",
