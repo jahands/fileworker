@@ -2,7 +2,7 @@
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
 	import UploadInfoCard from '$lib/components/UploadInfoCard.svelte'
-	import { Dropzone, Fileupload, Heading, Helper, Label, P, Spinner } from 'flowbite-svelte'
+	import { Dropzone, Fileupload, Heading, Label, P, Spinner } from 'flowbite-svelte'
 
 	import type { UploadFileResponse } from '$lib/api'
 
