@@ -3,30 +3,33 @@
 </script>
 
 <script lang="ts">
-	import { Alert } from "flowbite-svelte"
+	import { Alert } from 'flowbite-svelte'
 
 	let props = $props()
 
 	export function computeColor(type: AlertType) {
-		switch  (type) {
-		case 'success':
-			return 'green'
-		case 'warning':
-			return 'orange'
-		case 'error':
-			return 'red'
-		default:
-			return 'red'
+		switch (type) {
+			case 'success':
+				return 'green'
+			case 'warning':
+				return 'orange'
+			case 'error':
+				return 'red'
+			default:
+				return 'red'
 		}
 	}
 
-	let idSequence = 0;
-	let alerts: {id: string, color: string, message: string}[] = $state([])
-	export function showAlert(message: string, { type = 'error', durationMillis = 7500 }: { type?: AlertType, durationMillis?: number }) {
+	let idSequence = 0
+	let alerts: { id: string; color: string; message: string }[] = $state([])
+	export function showAlert(
+		message: string,
+		{ type = 'error', durationMillis = 7500 }: { type?: AlertType; durationMillis?: number },
+	) {
 		idSequence++
 		const id = `alert-${idSequence}`
 		const color = computeColor(type)
-		alerts.push({ id, color, message})
+		alerts.push({ id, color, message })
 		setTimeout(() => {
 			alerts = alerts.filter((a) => a.id != id)
 		}, durationMillis)

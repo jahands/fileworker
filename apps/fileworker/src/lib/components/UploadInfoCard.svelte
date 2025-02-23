@@ -12,8 +12,8 @@
 	}: {
 		file_id: string
 		filename: string
-		deletionToken?: string,
-		onDelete: (file_id: string) => void,
+		deletionToken?: string
+		onDelete: (file_id: string) => void
 		[key: string]: unknown
 	} = $props()
 
@@ -25,13 +25,13 @@
 		url.pathname = `/${file_id}/${filename}`
 		return url
 	})
-	
+
 	let urlText = $derived(url.toString())
 
 	let curlText = $derived(`curl --remote-name '${urlText}'`)
 
 	async function clickToCopy(text: string) {
-		await navigator.clipboard.writeText(text);
+		await navigator.clipboard.writeText(text)
 	}
 	async function submitDelete() {
 		submitting = true
@@ -56,34 +56,52 @@
 					break
 			}
 		} finally {
-			submitting = false			
+			submitting = false
 		}
 	}
 </script>
 
 <Card {...rest} class="max-w-full">
 	<div class="flex justify-between content-center gap-4 mb-6">
-		<Input value={urlText} disabled class="disabled:opacity-100 disabled:cursor-default"  />
-		<GradientButton class="shrink-0 flex-none" onclick={() => clickToCopy(urlText)} outline color="greenToBlue" >
+		<Input value={urlText} disabled class="disabled:opacity-100 disabled:cursor-default" />
+		<GradientButton
+			class="shrink-0 flex-none"
+			onclick={() => clickToCopy(urlText)}
+			outline
+			color="greenToBlue"
+		>
 			Copy link
 		</GradientButton>
 	</div>
-	
+
 	<div class="flex justify-between content-center gap-4">
-		<Input value={curlText} disabled class="disabled:opacity-100 disabled:cursor-default"  />
-		<GradientButton onclick={() => clickToCopy(curlText)} outline color="greenToBlue" class="flex-none">
+		<Input value={curlText} disabled class="disabled:opacity-100 disabled:cursor-default" />
+		<GradientButton
+			onclick={() => clickToCopy(curlText)}
+			outline
+			color="greenToBlue"
+			class="flex-none"
+		>
 			Copy curl
 		</GradientButton>
 	</div>
-
 
 	{#if deletionToken}
 		<div class="mt-10">
 			<h1 class="mb-4">Delete Token</h1>
 			<AlertFeed bind:this={alertFeed} />
 			<div class="flex justify-between content-center gap-4 mb-6">
-				<Input value={deletionToken} disabled class="disabled:opacity-100 disabled:cursor-default"  />
-				<GradientButton onclick={() => clickToCopy(deletionToken)} outline color="greenToBlue" class="flex-none">
+				<Input
+					value={deletionToken}
+					disabled
+					class="disabled:opacity-100 disabled:cursor-default"
+				/>
+				<GradientButton
+					onclick={() => clickToCopy(deletionToken)}
+					outline
+					color="greenToBlue"
+					class="flex-none"
+				>
 					Copy token
 				</GradientButton>
 				<GradientButton onclick={submitDelete} color="red" disabled={submitting} class="flex-none">
@@ -93,9 +111,7 @@
 						Delete
 					{/if}
 				</GradientButton>
-			</div>	
+			</div>
 		</div>
 	{/if}
 </Card>
-
-
