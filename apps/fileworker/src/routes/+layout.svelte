@@ -19,7 +19,7 @@
 		<NavUl {activeUrl} {hidden}>
 			<NavLi href="/front/upload">Upload</NavLi>
 			<NavLi href="/front/download">Download</NavLi>
-			<NavLi href="/front/deletion">Deletion</NavLi>
+			<NavLi href="/front/delete">Delete</NavLi>
 		</NavUl>
 	</Navbar>
 
