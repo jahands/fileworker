@@ -19,6 +19,9 @@
 			"mode": "auto"
 		}
 	],
+	"[svelte]": {
+		"editor.formatOnSave": true
+	},
 	"cSpell.words": [
 		"cloudflareaccess",
 		"codemod",

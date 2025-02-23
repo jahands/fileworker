@@ -1,16 +1,31 @@
 <script lang="ts">
 	import AlertFeed from '$lib/components/AlertFeed.svelte'
 	import Body from '$lib/components/Body.svelte'
+	import UploadInfoCard from '$lib/components/UploadInfoCard.svelte'
 	import { Dropzone, Fileupload, Heading, Helper, Label, P, Spinner } from 'flowbite-svelte'
-	import UploadInfoCard from '$lib/components/UploadInfoCard.svelte';
+
 	import type { UploadFileResponse } from '$lib/api'
 
 	let alertFeed: AlertFeed
 
 	let files = $state<FileList>()
-	let candidateFile = $derived(files?.item(0) || null)
+	let candidateFiles = $derived.by(() => {
+		const candidateFiles: File[] = []
+		if (!files) {
+			return candidateFiles
+		}
+
+		const length = files.length
+		for (var i = 0; i < length; i++) {
+			const file = files.item(i)
+			if (file) {
+				candidateFiles.push(file)
+			}
+		}
+		return candidateFiles
+	})
 	let submitting = $state(false)
-	
+
 	let uploadedFiles = $state<UploadFileResponse[]>([])
 
 	function onDropzoneDrop(event: DragEvent) {
@@ -34,8 +49,10 @@
 	}
 
 	$effect(() => {
-		if (candidateFile) {
-			submitFile(candidateFile)
+		if (candidateFiles.length > 0) {
+			candidateFiles.forEach((f) => {
+				submitFile(f)
+			})
 		}
 	})
 
@@ -54,7 +71,7 @@
 						return
 					}
 					uploadedFiles.push(json)
-					
+
 					alertFeed.showAlert(`File upload successful.`, { type: 'success' })
 					break
 				default:
@@ -67,7 +84,7 @@
 	}
 
 	function onDelete(file_id: string) {
-		uploadedFiles = uploadedFiles.filter(f => f.file_id !== file_id) 
+		uploadedFiles = uploadedFiles.filter((f) => f.file_id !== file_id)
 		alertFeed.showAlert(`File deletion successful.`, {
 			type: 'success',
 		})
@@ -110,16 +127,18 @@
 					d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
 				/>
 			</svg>
-			{#if !candidateFile}
+			{#if candidateFiles.length === 0}
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload</span>
-					 or drag and drop.
+					or drag and drop.
 				</p>
 			{:else}
-				<p class="mb-2">{candidateFile.name}</p>
+				{#each candidateFiles as candidateFile}
+					<p class="mb-2">{candidateFile.name}</p>
+				{/each}
 				<p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
 					<span class="font-semibold">Click to upload another file</span>
-					 or drag and drop.
+					or drag and drop.
 				</p>
 			{/if}
 		</Dropzone>
@@ -131,11 +150,12 @@
 
 	{#each uploadedFiles as uploadedFile}
 		<div class="mb-4">
-			<UploadInfoCard class="mx-auto" 
-				file_id={uploadedFile.file_id}  
+			<UploadInfoCard
+				class="mx-auto"
+				file_id={uploadedFile.file_id}
 				filename={uploadedFile.filename}
-				deletionToken={uploadedFile.delete_token} 
-				onDelete={onDelete} 
+				deletionToken={uploadedFile.delete_token}
+				{onDelete}
 			/>
 		</div>
 	{/each}
